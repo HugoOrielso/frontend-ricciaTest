@@ -5,10 +5,11 @@ import TestForm from './components/TestForm'
 function App() {
 
   return (
-    <>
+    <div className='p-2'>
+    
       <TestForm/>
       <Toaster richColors/>
-    </>
+    </div>
   )
 }
 
