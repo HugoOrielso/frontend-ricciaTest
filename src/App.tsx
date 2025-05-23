@@ -28,7 +28,7 @@ function App() {
   }, []);
 
   return (
-    <div className='p-2 min-h-[500px]'>
+    <div className='min-h-[500px]'>
       <TestForm />
       <Toaster richColors />
     </div>
