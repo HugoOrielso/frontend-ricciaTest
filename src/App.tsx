@@ -6,28 +6,29 @@ import { useEffect } from 'react'
 function App() {
   useEffect(() => {
     function enviarAltura() {
-      const altura = document.documentElement.scrollHeight
-      window.parent.postMessage({ alturaIframe: altura }, "*")
+      const altura = document.documentElement.scrollHeight;
+      window.parent.postMessage({ alturaIframe: altura }, "*");
     }
 
-    enviarAltura()
+    enviarAltura();
 
-    const mutationObserver = new MutationObserver(enviarAltura)
-    mutationObserver.observe(document.body, { childList: true, subtree: true })
+    const mutationObserver = new MutationObserver(enviarAltura);
+    mutationObserver.observe(document.body, { childList: true, subtree: true });
 
-    const resizeObserver = new ResizeObserver(enviarAltura)
-    resizeObserver.observe(document.documentElement)
+    const resizeObserver = new ResizeObserver(enviarAltura);
+    resizeObserver.observe(document.documentElement);
 
-    window.addEventListener('resize', enviarAltura)
+    window.addEventListener('resize', enviarAltura);
 
     return () => {
-      mutationObserver.disconnect()
-      resizeObserver.disconnect()
-      window.removeEventListener('resize', enviarAltura)
-    }
-  }, [])
+      mutationObserver.disconnect();
+      resizeObserver.disconnect();
+      window.removeEventListener('resize', enviarAltura);
+    };
+  }, []);
+
   return (
-    <div className='p-2'>
+    <div className='p-2 min-h-[500px]'>
       <TestForm />
       <Toaster richColors />
     </div>
