@@ -2,51 +2,76 @@ import { type EmblaOptionsType } from 'embla-carousel'
 import EmblaCarousel from './EmblaCarrousel'
 import '../assets/base.css'
 import '../assets/embla.css'
-const Reply = ({ message, prodotti, resetTest }: { message: string, prodotti: Prodotti[], resetTest: () => void }) => {
-    const OPTIONS: EmblaOptionsType = { loop: true }
 
-    return (
-        <div className="p-6 border border-[#e87db5]/20 rounded-lg bg-[#e87db5]/10 text-center animate-fadeIn">
-            <div className="flex flex-col items-center justify-center space-y-4">
-                <div className=" ">
-                    <div className="flex flex-col space-y-1.5 p-6 bg-gradient-to-r from-pink-100 to-pink-200 pb-2"><div className="flex items-center gap-2"><div className="inline-flex items-center rounded-full border text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent hover:bg-primary/80 bg-pink-500 text-white px-3 py-1" data-v0-t="badge"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" className="lucide lucide-check w-4 h-4 mr-1"><path d="M20 6 9 17l-5-5"></path></svg>Personalizzato</div><h2 className="text-lg font-semibold text-pink-800">La tua routine per capelli ricci</h2></div><p className="text-sm text-pink-700 mt-2">Routine generata in tempo reale con il nostro assistente AI addestrato da La Ragazza Riccia</p></div>
-                </div>
-                <div className="text-left flex w-full space-y-1 text-[#5D4037]">
-                    <ul className="list-disc list-inside space-y-1">
-                        {message
-                            .split("- ")
-                            .filter((r) => r.trim() !== "")
-                            .map((step, index) => (
-                                <div className="text-left flex w-full">
-                                    {
-                                        index === 0 ?
-                                            <h3 className="text-xl font-medium" key={index}>{step.trim()}</h3>
-                                            :
-                                            <li key={index}>{step.trim()}</li>
-                                    }
-                                </div>
-                            ))}
-                    </ul>
-                </div>
+const Reply = ({
+  message,
+  prodotti,
+}: {
+  message: string
+  prodotti: Prodotti[]
+  resetTest: () => void
+}) => {
+  const OPTIONS: EmblaOptionsType = { loop: true }
 
-                <p className="text-gray-600">
-                    Abbiamo creato una routine personalizzata basata sulle tue risposte. Ecco i prodotti consigliati per i tuoi ricci:
-                </p>
+  const righe = message
+    .split("\n- ")
+    .filter(r => r.trim() !== "")
 
-                {
-                    prodotti.length > 0 &&
-                    <EmblaCarousel slides={prodotti} options={OPTIONS} />
-                }
+  const titolo = righe[0]
+  const passi = righe.slice(1)
 
-                <button
-                    onClick={resetTest}
-                    className="mt-4 bg-white border cursor-pointer border-[#e87db5] text-[#e87db5] hover:bg-[#e87db5] hover:text-white transition-colors duration-200 px-4 py-2 rounded-md"
-                >
-                    Torna al test
-                </button>
-            </div>
+  return (
+    <div className="w-full max-w-4xl mx-auto px-2 py-6 animate-fadeIn">
+
+      {/* Badge header */}
+      <div className="flex items-center gap-2 mb-4">
+        <span className="inline-flex items-center gap-1 bg-[#E92176] text-white text-xs font-medium px-3 py-1 rounded-full">
+          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+          Personalizzato
+        </span>
+        <h2 className="text-base font-semibold text-pink-800">La tua routine per capelli ricci</h2>
+      </div>
+
+      {/* Layout: 2 col desktop, 1 col mobile */}
+      <div className="flex flex-col md:flex-row gap-6">
+
+        {/* Colonna sinistra: testo routine */}
+        <div className="flex-1 bg-white border border-[#E92176]/15 rounded-2xl p-5 shadow-sm">
+          <p className="text-xs font-medium text-[#E92176] uppercase tracking-wide mb-3">
+            La tua routine
+          </p>
+          <h3 className="text-sm font-semibold text-gray-800 mb-4">{titolo}</h3>
+          <ol className="space-y-3">
+            {passi.map((step, i) => (
+              <li key={i} className="flex gap-3">
+                <span className="mt-0.5 flex-shrink-0 w-5 h-5 rounded-full bg-[#E92176]/10 text-[#E92176] text-xs font-semibold flex items-center justify-center">
+                  {i + 1}
+                </span>
+                <p className="text-sm text-gray-700 leading-relaxed">{step.trim()}</p>
+              </li>
+            ))}
+          </ol>
+
+          <button
+            onClick={ ()=> location.reload()}
+            className="mt-6 w-full text-sm border border-[#E92176]/40 text-[#E92176] hover:bg-[#E92176] hover:text-white transition-colors duration-200 px-4 py-2 rounded-lg cursor-pointer"
+          >
+            ← Rifai il test
+          </button>
         </div>
-    )
+
+        {/* Colonna destra: prodotti */}
+        {prodotti.length > 0 && (
+          <div className="flex-1 bg-pink-50/60 border border-[#E92176]/15 rounded-2xl p-5 shadow-sm">
+            <p className="text-xs font-medium text-[#E92176] uppercase tracking-wide mb-3">
+              Prodotti consigliati
+            </p>
+            <EmblaCarousel slides={prodotti} options={OPTIONS} />
+          </div>
+        )}
+      </div>
+    </div>
+  )
 }
 
 export default Reply
