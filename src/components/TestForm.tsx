@@ -81,8 +81,7 @@ const TestForm = () => {
     }
 
     return (
-        <div className="min-h-screen w-full flex items-center justify-center px-4 py-10"
-            style={{ background: PINK_LIGHT }}>
+        <div className="min-h-screen w-full flex items-center justify-center px-4 py-10">
 
             {reply.length === 0 && (
                 <form

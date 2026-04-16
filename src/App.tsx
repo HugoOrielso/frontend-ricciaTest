@@ -6,29 +6,58 @@ import { useEffect } from 'react'
 function App() {
   useEffect(() => {
     function enviarAltura() {
-      const altura = document.documentElement.scrollHeight;
-      window.parent.postMessage({ alturaIframe: altura }, "*");
+      const altura = Math.max(
+        document.body.scrollHeight,
+        document.documentElement.scrollHeight,
+        document.body.offsetHeight,
+        document.documentElement.offsetHeight,
+        document.body.clientHeight,
+        document.documentElement.clientHeight
+      )
+
+      window.parent.postMessage(
+        {
+          type: 'RICCIA_IFRAME_HEIGHT',
+          alturaIframe: altura,
+        },
+        '*'
+      )
     }
 
-    enviarAltura();
+    const raf = requestAnimationFrame(enviarAltura)
+    const timeout = setTimeout(enviarAltura, 300)
 
-    const mutationObserver = new MutationObserver(enviarAltura);
-    mutationObserver.observe(document.body, { childList: true, subtree: true });
+    const mutationObserver = new MutationObserver(() => {
+      enviarAltura()
+    })
+    mutationObserver.observe(document.body, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      characterData: true,
+    })
 
-    const resizeObserver = new ResizeObserver(enviarAltura);
-    resizeObserver.observe(document.documentElement);
+    const resizeObserver = new ResizeObserver(() => {
+      enviarAltura()
+    })
+    resizeObserver.observe(document.body)
+    resizeObserver.observe(document.documentElement)
 
-    window.addEventListener('resize', enviarAltura);
+    window.addEventListener('resize', enviarAltura)
+    window.addEventListener('load', enviarAltura)
 
     return () => {
-      mutationObserver.disconnect();
-      resizeObserver.disconnect();
-      window.removeEventListener('resize', enviarAltura);
-    };
-  }, []);
+      cancelAnimationFrame(raf)
+      clearTimeout(timeout)
+      mutationObserver.disconnect()
+      resizeObserver.disconnect()
+      window.removeEventListener('resize', enviarAltura)
+      window.removeEventListener('load', enviarAltura)
+    }
+  }, [])
 
   return (
-    <div className='min-h-[500px]'>
+    <div style={{ width: '100%', minHeight: '500px' }}>
       <TestForm />
       <Toaster richColors />
     </div>
