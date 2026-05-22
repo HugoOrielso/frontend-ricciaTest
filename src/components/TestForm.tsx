@@ -31,6 +31,7 @@ const formSchema = z.object({
 type FormValues = z.infer<typeof formSchema>
 
 const TestForm = () => {
+    const API_URL = import.meta.env.VITE_API_URL
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
     const [reply, setReply] = useState<string>('')
     const [prodottiTrovati, setProdottiTrovati] = useState<Prodotti[]>([])
@@ -61,23 +62,63 @@ const TestForm = () => {
 
     async function onSubmit(values: FormValues): Promise<void> {
         const requiredFields: Array<keyof FormValues> = [
-            "cuoioCapelluto", "spessoreCapello", "porosita",
-            "sts", "densita", "personalitaRicci",
+            "cuoioCapelluto",
+            "spessoreCapello",
+            "porosita",
+            "sts",
+            "densita",
+            "personalitaRicci",
         ]
+
         const missingFields = requiredFields.filter(f => !values[f])
+
         if (missingFields.length > 0) {
-            toast.message('Campi obbligatori mancanti', {
+            toast.message("Campi obbligatori mancanti", {
                 description: "Per favore, seleziona un'opzione per ogni domanda.",
             })
             return
         }
-        setIsSubmitting(true)
-        await new Promise(r => setTimeout(r, 900))
-        const { testo, prodotti } = generaRutina(values)
-        setReply(testo)
-        setProdottiTrovati(prodotti)
-        toast.success("Grazie per aver completato il test.")
-        setIsSubmitting(false)
+
+        try {
+            setIsSubmitting(true)
+
+            const response = await fetch(API_URL, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    email: values.email,
+                    name: values.nome,
+                }),
+            })
+
+            const data = await response.json()
+
+            if (!response.ok) {
+                throw new Error(data?.message || "Errore durante l'iscrizione")
+            }
+
+            const { testo, prodotti } = generaRutina(values)
+
+            setReply(testo)
+            setProdottiTrovati(prodotti)
+
+            toast.success("Test completato con successo", {
+                description: "La tua routine è pronta e la tua email è stata registrata.",
+            })
+        } catch (error) {
+            console.error(error)
+
+            toast.error("Ops, qualcosa è andato storto", {
+                description:
+                    error instanceof Error
+                        ? error.message
+                        : "Non siamo riusciti a completare l'iscrizione.",
+            })
+        } finally {
+            setIsSubmitting(false)
+        }
     }
 
     return (
