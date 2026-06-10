@@ -62,7 +62,7 @@ const Reply = ({
 
         {/* Colonna destra: prodotti */}
         {prodotti.length > 0 && (
-          <div className="flex-1 bg-pink-50/60 border border-[#E92176]/15 rounded-2xl p-5 shadow-sm">
+          <div className="flex-1 items-center justify-center bg-pink-50/60 border border-[#E92176]/15 rounded-2xl p-5 shadow-sm">
             <p className=" font-medium text-[#E92176] uppercase tracking-wide mb-3">
               Prodotti consigliati
             </p>
