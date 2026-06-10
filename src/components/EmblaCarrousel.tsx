@@ -29,13 +29,13 @@ const EmblaCarousel: React.FC<PropType> = (props) => {
     } = usePrevNextButtons(emblaApi)
 
     return (
-        <section className="embla items-center justify-center">
+        <section className="embla flex flex-col items-center justify-center">
             <div className="embla__viewport" ref={emblaRef}>
                 <div className="embla__container">
                     {slides.map((item, index) => (
                         <div className="embla__slide" key={index}>
                             <div>
-                                <img className="aspect-square rounded object-cover" src={item.immagine} alt={item.nome} />
+                                <img className="aspect-square rounded object-cover w-[90%] " src={item.immagine} alt={item.nome} />
                             </div>
                             <div>
                                 <div className='space-y-2'>
