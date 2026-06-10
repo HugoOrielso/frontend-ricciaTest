@@ -149,7 +149,7 @@ const TestForm = () => {
                                     Conosco i Miei Ricci
                                 </h1>
                             </div>
-                            <p className="text-xs" style={{ color: TEXT_SOFT }}>
+                            <p className="" style={{ color: TEXT_SOFT }}>
                                 Rispondi a {domandeCMR.length} domande per scoprire la tua routine perfetta
                             </p>
                         </div>
@@ -164,7 +164,7 @@ const TestForm = () => {
 
                         {/* Contador pasos */}
                         <div className="flex justify-between items-center px-6 pt-4">
-                            <span className="text-xs font-medium" style={{ color: TEXT_SOFT }}>
+                            <span className=" font-medium" style={{ color: TEXT_SOFT }}>
                                 Domanda {currentIndex + 1} di {domandeCMR.length}
                             </span>
                             <div className="flex gap-1">
@@ -187,11 +187,11 @@ const TestForm = () => {
                                     className="flex flex-col gap-4"
                                 >
                                     <div>
-                                        <h2 className="text-base font-semibold mb-1"
+                                        <h2 className="text-start font-semibold mb-1"
                                             style={{ color: TEXT_DARK }}>
                                             {domanda.titolo}
                                         </h2>
-                                        <p className="text-sm leading-relaxed"
+                                        <p className="text-start leading-relaxed"
                                             style={{ color: TEXT_MID }}>
                                             {domanda.descrizione}
                                             <span style={{ color: PINK, marginLeft: 2 }}>*</span>
@@ -209,7 +209,7 @@ const TestForm = () => {
                                                 <label
                                                     key={opzione.id}
                                                     htmlFor={opzione.id}
-                                                    className="flex items-center gap-3 rounded-xl px-4 py-3 cursor-pointer transition-all duration-150"
+                                                    className="flex items-center gap-3 rounded-xl p-5 cursor-pointer transition-all duration-150"
                                                     style={{
                                                         border: `1.5px solid ${checked ? PINK : PINK_MID}`,
                                                         background: checked ? PINK_LIGHT : "white",
@@ -218,10 +218,10 @@ const TestForm = () => {
                                                     <RadioGroupItem
                                                         value={opzione.value}
                                                         id={opzione.id}
-                                                        className="shrink-0"
+                                                        className="shrink-0 size-6"
                                                         style={{ accentColor: PINK, color: PINK, borderColor: PINK } as React.CSSProperties}
                                                     />
-                                                    <span className="text-sm leading-snug"
+                                                    <span className="text-start leading-snug"
                                                         style={{ color: checked ? TEXT_DARK : TEXT_MID }}>
                                                         {opzione.label}
                                                     </span>
@@ -231,7 +231,7 @@ const TestForm = () => {
                                     </RadioGroup>
 
                                     {form.formState.errors[domandaId] && (
-                                        <p className="text-xs" style={{ color: PINK }}>
+                                        <p className="" style={{ color: PINK }}>
                                             {form.formState.errors[domandaId]?.message}
                                         </p>
                                     )}
@@ -240,7 +240,7 @@ const TestForm = () => {
                                     {isLast && (
                                         <div className="flex flex-col gap-3 pt-2">
                                             <div className="flex flex-col gap-1">
-                                                <label className="text-xs font-medium" style={{ color: TEXT_MID }}>
+                                                <label className=" font-medium" style={{ color: TEXT_MID }}>
                                                     La tua email *
                                                 </label>
                                                 <input
@@ -258,13 +258,13 @@ const TestForm = () => {
                                                     onBlur={e => e.target.style.borderColor = PINK_MID}
                                                 />
                                                 {form.formState.errors.email && (
-                                                    <p className="text-xs" style={{ color: PINK }}>
+                                                    <p className="" style={{ color: PINK }}>
                                                         {form.formState.errors.email.message}
                                                     </p>
                                                 )}
                                             </div>
                                             <div className="flex flex-col gap-1">
-                                                <label className="text-xs font-medium" style={{ color: TEXT_MID }}>
+                                                <label className=" font-medium" style={{ color: TEXT_MID }}>
                                                     Il tuo nome *
                                                 </label>
                                                 <input
@@ -282,7 +282,7 @@ const TestForm = () => {
                                                     onBlur={e => e.target.style.borderColor = PINK_MID}
                                                 />
                                                 {form.formState.errors.nome && (
-                                                    <p className="text-xs" style={{ color: PINK }}>
+                                                    <p className="" style={{ color: PINK }}>
                                                         {form.formState.errors.nome.message}
                                                     </p>
                                                 )}
@@ -303,7 +303,7 @@ const TestForm = () => {
                                     <p className="text-sm font-medium" style={{ color: TEXT_DARK }}>
                                         Creiamo la tua routine...
                                     </p>
-                                    <p className="text-xs" style={{ color: TEXT_SOFT }}>
+                                    <p className="" style={{ color: TEXT_SOFT }}>
                                         Analizziamo le tue risposte
                                     </p>
                                 </div>
