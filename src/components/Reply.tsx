@@ -25,7 +25,7 @@ const Reply = ({
 
       {/* Badge header */}
       <div className="flex items-center gap-2 mb-4">
-        <span className="inline-flex items-center gap-1 bg-[#E92176] text-white text-xs font-medium px-3 py-1 rounded-full">
+        <span className="inline-flex items-center gap-1 bg-[#E92176] text-white  font-medium px-3 py-1 rounded-full">
           <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
           Personalizzato
         </span>
@@ -37,14 +37,14 @@ const Reply = ({
 
         {/* Colonna sinistra: testo routine */}
         <div className="flex-1 bg-white border border-[#E92176]/15 rounded-2xl p-5 shadow-sm">
-          <p className="text-xs font-medium text-[#E92176] uppercase tracking-wide mb-3">
+          <p className=" font-medium text-[#E92176] uppercase tracking-wide mb-3">
             La tua routine
           </p>
           <h3 className="text-sm font-semibold text-gray-800 mb-4">{titolo}</h3>
           <ol className="space-y-3">
             {passi.map((step, i) => (
               <li key={i} className="flex gap-3">
-                <span className="mt-0.5 flex-shrink-0 w-5 h-5 rounded-full bg-[#E92176]/10 text-[#E92176] text-xs font-semibold flex items-center justify-center">
+                <span className="mt-0.5 flex-shrink-0 w-5 h-5 rounded-full bg-[#E92176]/10 text-[#E92176]  font-semibold flex items-center justify-center">
                   {i + 1}
                 </span>
                 <p className="text-sm text-gray-700 leading-relaxed">{step.trim()}</p>
@@ -63,7 +63,7 @@ const Reply = ({
         {/* Colonna destra: prodotti */}
         {prodotti.length > 0 && (
           <div className="flex-1 bg-pink-50/60 border border-[#E92176]/15 rounded-2xl p-5 shadow-sm">
-            <p className="text-xs font-medium text-[#E92176] uppercase tracking-wide mb-3">
+            <p className=" font-medium text-[#E92176] uppercase tracking-wide mb-3">
               Prodotti consigliati
             </p>
             <EmblaCarousel slides={prodotti} options={OPTIONS} />

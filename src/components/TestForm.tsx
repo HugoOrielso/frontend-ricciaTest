@@ -251,7 +251,7 @@ const TestForm = () => {
                                                         required
                                                         placeholder="nome@esempio.com"
                                                         {...form.register("email")}
-                                                        className="w-full rounded-xl px-4 py-2.5 text-sm outline-none transition-all"
+                                                        className="w-full rounded-xl px-4 py-2.5  outline-none transition-all"
                                                         style={{
                                                             border: `1.5px solid ${PINK_MID}`,
                                                             color: TEXT_DARK,
@@ -275,7 +275,7 @@ const TestForm = () => {
                                                         required
                                                         placeholder="Come ti chiami?"
                                                         {...form.register("nome")}
-                                                        className="w-full rounded-xl px-4 py-2.5 text-sm outline-none transition-all"
+                                                        className="w-full rounded-xl px-4 py-2.5  outline-none transition-all"
                                                         style={{
                                                             border: `1.5px solid ${PINK_MID}`,
                                                             color: TEXT_DARK,
