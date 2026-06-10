@@ -1,7 +1,7 @@
 export const domandeCMR = [
   {
     id: "guidaLavaggio",
-    titolo: "1. Dopo quanti giorni senti il bisogno di lavare i tuoi ricci? (labaggio) ",
+    titolo: "1. Dopo quanti giorni senti il bisogno di lavare i tuoi ricci?",
     descrizione: "Guida al lavaggio: oleosità e frequenza.",
     opzioni: [
       { id: "dopo-1-giorno", value: "dopo-1-giorno", label: "Dopo 1 giorno" },
@@ -23,7 +23,7 @@ export const domandeCMR = [
   },
   {
     id: "sts",
-    titolo: "3. Negli ultimi 12 mesi hai vissuto una di queste situazioni? (sts) ",
+    titolo: "3. Negli ultimi 12 mesi hai vissuto una di queste situazioni?",
     descrizione: "STS semplificato: stile di vita, trattamenti e salute.",
     opzioni: [
       { id: "colore-decolorazione-stiraggio", value: "colore-decolorazione-stiraggio", label: "Colore, decolorazione o stiraggio" },
@@ -34,7 +34,7 @@ export const domandeCMR = [
   },
   {
     id: "spessoreDensita",
-    titolo: "4. Come descriveresti i tuoi capelli nella vita reale? (densita) ",
+    titolo: "4. Come descriveresti i tuoi capelli nella vita reale?",
     descrizione: "Spessore e densità.",
     opzioni: [
       { id: "fini-pochi", value: "fini-pochi", label: "Fini e pochi" },
