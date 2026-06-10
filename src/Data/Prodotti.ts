@@ -23,22 +23,4 @@ export const prodottiDisponibili = [
     immagine: "https://laragazzariccia.com/cdn/shop/files/leavein_1080x1080.png?v=1732282443",
     link: "https://laragazzariccia.com/collections/prodotti/products/leave-in-riccia"
   },
-  {
-    nome: "Crema 3 in 1 250ml",
-    descrizione: "Definizione intensa, maschera o conditioner.",
-    immagine: "https://laragazzariccia.com/cdn/shop/files/cremarf_1080x1080.png?v=1729152506",
-    link: "https://laragazzariccia.com/collections/prodotti/products/crema-3-in-1-250-ml"
-  },
-  {
-    nome: "Gel Modellante 250 ml",
-    descrizione: "Definizione e tenuta anti-crespo.",
-    immagine: "https://laragazzariccia.com/cdn/shop/files/gel_rf_1080x1080.png?v=1729152709",
-    link: "https://laragazzariccia.com/collections/prodotti/products/gel-modellante-250-ml"
-  },
-  {
-    nome: 'KIT I MIEI SUPERPOTERI',
-    descrizione: "Cura settimanale in 3 fasi: idrata, nutre, ripara.",
-    immagine: "https://laragazzariccia.com/cdn/shop/files/DSC2846_1080x1080.webp?v=1741810317",
-    link: "https://laragazzariccia.com/collections/prodotti/products/kit-i-miei-superpoteri"
-  }
 ]
