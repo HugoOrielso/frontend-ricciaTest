@@ -1,7 +1,7 @@
-import { type EmblaOptionsType } from 'embla-carousel'
-import EmblaCarousel from './EmblaCarrousel'
-import '../assets/base.css'
-import '../assets/embla.css'
+import { type EmblaOptionsType } from "embla-carousel"
+import EmblaCarousel from "./EmblaCarrousel"
+import "../assets/base.css"
+import "../assets/embla.css"
 
 const Reply = ({
   message,
@@ -11,64 +11,68 @@ const Reply = ({
   prodotti: Prodotti[]
   resetTest: () => void
 }) => {
-  const OPTIONS: EmblaOptionsType = { loop: true }
+  const OPTIONS: EmblaOptionsType = { loop: prodotti.length > 1 }
 
-  const righe = message
-    .split("\n- ")
-    .filter(r => r.trim() !== "")
-
+  const righe = message.split("\n- ").filter(r => r.trim() !== "")
   const titolo = righe[0]
   const passi = righe.slice(1)
 
   return (
-    <div className="w-full  mx-auto px-2 py-6 animate-fadeIn">
+    <div className="w-full max-w-5xl mx-auto px-3 py-4 animate-fadeIn">
+      <div className="bg-white border border-[#E92176]/20 rounded-3xl shadow-sm overflow-hidden">
 
-      {/* Badge header */}
-      <div className="flex items-center gap-2 mb-4">
-        <span className="inline-flex items-center gap-1 bg-[#E92176] text-white  font-medium px-3 py-1 rounded-full">
-          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
-          Personalizzato
-        </span>
-        <h2 className="text-base font-semibold text-pink-800">La tua routine per capelli ricci</h2>
-      </div>
-
-      {/* Layout: 2 col desktop, 1 col mobile */}
-      <div className="flex flex-col md:flex-row gap-6">
-
-        {/* Colonna sinistra: testo routine */}
-        <div className="flex-1 bg-white border border-[#E92176]/15 rounded-2xl p-5 shadow-sm">
-          <p className="  font-medium text-[#E92176] uppercase tracking-wide mb-3">
-            La tua routine
-          </p>
-          <h3 className=" font-semibold text-gray-800 mb-4">{titolo}</h3>
-          <ol className="space-y-3">
-            {passi.map((step, i) => (
-              <li key={i} className="flex gap-3">
-                <span className="mt-0.5 flex-shrink-0 w-5 h-5 rounded-full bg-[#E92176]/10 text-[#E92176]  font-semibold flex items-center justify-center">
-                  {i + 1}
-                </span>
-                <p className="text-start text-gray-700 leading-relaxed">{step.trim()}</p>
-              </li>
-            ))}
-          </ol>
-
-          <button
-            onClick={ ()=> location.reload()}
-            className="mt-6 w-full  border border-[#E92176]/40 text-[#E92176] hover:bg-[#E92176] hover:text-white transition-colors duration-200 px-4 py-2 rounded-lg cursor-pointer"
-          >
-            ← Rifai il test
-          </button>
+        <div className="px-5 py-4 border-b border-[#E92176]/10 bg-pink-50/40">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="inline-flex items-center gap-1 bg-[#E92176] text-white text-sm font-semibold px-3 py-1 rounded-full">
+              ✓ Personalizzato
+            </span>
+            <span className="text-sm font-medium text-pink-800">
+              La tua routine per capelli ricci
+            </span>
+          </div>
         </div>
 
-        {/* Colonna destra: prodotti */}
-        {prodotti.length > 0 && (
-          <div className=" items-center justify-center bg-pink-50/60 border border-[#E92176]/15 rounded-2xl p-5 shadow-sm">
-            <p className=" font-medium text-[#E92176] uppercase tracking-wide mb-3">
-              Prodotti consigliati
+        <div className="p-5 md:p-6 grid grid-cols-1 lg:grid-cols-[1.1fr_0.9fr] gap-6 items-start">
+          <div>
+            <p className="text-sm font-semibold text-[#E92176] uppercase tracking-wide mb-2">
+              La tua routine
             </p>
-            <EmblaCarousel slides={prodotti} options={OPTIONS} />
+
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">
+              {titolo}
+            </h3>
+
+            <ol className="space-y-3">
+              {passi.map((step, i) => (
+                <li key={i} className="flex gap-3">
+                  <span className="mt-0.5 flex-shrink-0 w-6 h-6 rounded-full bg-[#E92176]/10 text-[#E92176] text-sm font-bold flex items-center justify-center">
+                    {i + 1}
+                  </span>
+                  <p className="text-start text-gray-700 leading-relaxed">
+                    {step.trim()}
+                  </p>
+                </li>
+              ))}
+            </ol>
+
+            <button
+              onClick={() => location.reload()}
+              className="mt-5 w-full sm:w-auto border border-[#E92176]/40 text-[#E92176] hover:bg-[#E92176] hover:text-white transition-colors duration-200 px-5 py-2.5 rounded-xl cursor-pointer font-medium"
+            >
+              ← Rifai il test
+            </button>
           </div>
-        )}
+
+          {prodotti.length > 0 && (
+            <div className="bg-pink-50/60 border border-[#E92176]/15 rounded-2xl flex items-center flex-col p-4">
+              <p className="text-sm font-semibold text-[#E92176] uppercase tracking-wide mb-3 text-center">
+                Prodotti consigliati
+              </p>
+
+              <EmblaCarousel slides={prodotti} options={OPTIONS} />
+            </div>
+          )}
+        </div>
       </div>
     </div>
   )

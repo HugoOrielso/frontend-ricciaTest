@@ -1,75 +1,95 @@
 export const domandeCMR = [
-    {
-        id: "cuoioCapelluto",
-        titolo: "1. Oleosità del cuoio capelluto",
-        descrizione: "Cosa succede al tuo cuoio capelluto dopo 2-3 giorni dal lavaggio?",
-        opzioni: [
-            { id: "rimane-secco", value: "rimane-secco", label: "Rimane secco, sento tensione e prurito" },
-            { id: "normale", value: "normale", label: "È normale, non noto nulla di strano" },
-            { id: "unto", value: "unto", label: "Si unge e inizia a pizzicare/prudere" },
-            { id: "giorni-dopo", value: "giorni-dopo", label: "Dopo 1 giorno già grasso/unto" },
-        ]
-    },
-    {
-        id: "spessoreCapello",
-        titolo: "2. Spessore del capello",
-        descrizione: "Prendi un solo capello tra le dita. Come lo senti?",
-        opzioni: [
-            { id: "sottile", value: "sottile", label: "Sottile come un filo d'erba" },
-            { id: "medio", value: "medio", label: "Medio, lo sento ma non troppo" },
-            { id: "grosso", value: "grosso", label: "Grosso come un filo di nylon" },
-        ]
-    },
-    {
-        id: "porosita",
-        titolo: "3. Porosità",
-        descrizione: "Quando applichi il balsamo, come reagiscono i tuoi capelli?",
-        opzioni: [
-            { id: "assorbono", value: "assorbono", label: "Lo assorbono subito e sembrano asciutti" },
-            { id: "ci-mettono", value: "ci-mettono", label: "Ci mettono un po' per diventare morbidi" },
-            { id: "rimane-sulla", value: "rimane-sulla", label: "Rimane sulla 'superficie' e scivolano via" },
-        ]
-    },
-    {
-        id: "sts",
-        titolo: "4. STS - Stile di vita, Trattamenti, Salute",
-        descrizione: "Negli ultimi 3 mesi, quale di questi ti rappresenta di più?",
-        opzioni: [
-            { id: "cambi-capigliatura", value: "cambi-capigliatura", label: "Ho fatto cambi capigliatura (decolorazioni)" },
-            { id: "stress", value: "stress", label: "Ho avuto stress ormonali, stress o caduta" },
-            { id: "cura-nulla", value: "cura-nulla", label: "Non curo molto i miei ricci" },
-            { id: "routine", value: "routine", label: "Ho una routine costante, ma non vedo risultati" },
-            { id: "nessuno", value: "nessuno", label: "Nessuno di questi" },
-        ]
-    },
-    {
-        id: "densita",
-        titolo: "5. Densità",
-        descrizione: "Quando ti guardi allo specchio a capelli asciutti, pensi che i tuoi capelli siano...",
-        opzioni: [
-            { id: "pochi", value: "pochi", label: "Pochi, vedo spesso la cute" },
-            { id: "normali", value: "normali", label: "Normali, la cute si vede poco" },
-            { id: "tanti", value: "tanti", label: "Tanti, non si vede nulla e sembrano una nuvola" },
-        ]
-    },
-    {
-        id: "personalitaRicci",
-        titolo: "6. Personalità dei ricci",
-        descrizione: "Come si comportano i tuoi ricci nella vita reale?",
-        opzioni: [
-            { id: "carattere", value: "carattere", label: "Ogni riccio ha il suo carattere, fanno come vogliono" },
-            { id: "coerenti", value: "coerenti", label: "Sono coerenti e ordinati, ma si gonfiano facilmente" },
-            { id: "definiti", value: "definiti", label: "Molto definiti, ma tendono al crespo" },
-            { id: "mossi", value: "mossi", label: "Mossi, quasi lisci" },
-        ]
-    }
-]
+  {
+    id: "guidaLavaggio",
+    titolo: "1. Dopo quanti giorni senti il bisogno di lavare i tuoi ricci? (labaggio) ",
+    descrizione: "Guida al lavaggio: oleosità e frequenza.",
+    opzioni: [
+      { id: "dopo-1-giorno", value: "dopo-1-giorno", label: "Dopo 1 giorno" },
+      { id: "dopo-2-3-giorni", value: "dopo-2-3-giorni", label: "Dopo 2-3 giorni" },
+      { id: "dopo-4-5-giorni", value: "dopo-4-5-giorni", label: "Dopo 4-5 giorni" },
+      { id: "una-settimana", value: "una-settimana", label: "Potrei stare anche una settimana" },
+    ],
+  },
+  {
+    id: "porosita",
+    titolo: "2. Quando applichi balsamo o maschera, i tuoi capelli…",
+    descrizione: "Porosità e bisogno delle lunghezze.",
+    opzioni: [
+      { id: "assorbono-secchi-crespi", value: "assorbono-secchi-crespi", label: "Assorbono subito tutto ma restano comunque secchi o crespi" },
+      { id: "tanto-prodotto", value: "tanto-prodotto", label: "Devono assorbire tanto prodotto prima di diventare morbidi" },
+      { id: "effetto-cartone", value: "effetto-cartone", label: "Appena li bagno sembrano duri, effetto “cartone”" },
+      { id: "subito-morbidi-setosi", value: "subito-morbidi-setosi", label: "Con poco prodotto diventano subito morbidi e setosi" },
+    ],
+  },
+  {
+    id: "sts",
+    titolo: "3. Negli ultimi 12 mesi hai vissuto una di queste situazioni? (sts) ",
+    descrizione: "STS semplificato: stile di vita, trattamenti e salute.",
+    opzioni: [
+      { id: "colore-decolorazione-stiraggio", value: "colore-decolorazione-stiraggio", label: "Colore, decolorazione o stiraggio" },
+      { id: "terapie-farmaci", value: "terapie-farmaci", label: "Terapie/farmaci importanti" },
+      { id: "cuffie-casco-legati", value: "cuffie-casco-legati", label: "Uso spesso cuffie/casco/capelli legati" },
+      { id: "nessuna", value: "nessuna", label: "Nessuna di queste" },
+    ],
+  },
+  {
+    id: "spessoreDensita",
+    titolo: "4. Come descriveresti i tuoi capelli nella vita reale? (densita) ",
+    descrizione: "Spessore e densità.",
+    opzioni: [
+      { id: "fini-pochi", value: "fini-pochi", label: "Fini e pochi" },
+      { id: "fini-tanti", value: "fini-tanti", label: "Fini ma tanti" },
+      { id: "medi-normali", value: "medi-normali", label: "Medi e normali" },
+      { id: "grossi-voluminosi", value: "grossi-voluminosi", label: "Grossi e voluminosi" },
+      { id: "tantissimi-difficili", value: "tantissimi-difficili", label: "Tantissimi e difficili da gestire" },
+    ],
+  },
+  {
+    id: "personalitaRicci",
+    titolo: "5. I tuoi ricci senza styling assomigliano di più a…",
+    descrizione: "Personalità del riccio.",
+    opzioni: [
+      { id: "onde-morbide", value: "onde-morbide", label: "Onde morbide" },
+      { id: "ricci-definiti", value: "ricci-definiti", label: "Ricci definiti" },
+      { id: "ricci-ribelli", value: "ricci-ribelli", label: "Ricci irregolari e “ribelli”" },
+      { id: "ricci-stretti-afro", value: "ricci-stretti-afro", label: "Ricci molto stretti o afro" },
+      { id: "mix-tutto", value: "mix-tutto", label: "Un mix di tutto 😂" },
+    ],
+  },
+  {
+    id: "problemaPrincipale",
+    titolo: "6. Qual è la cosa che ti frustra di più dei tuoi ricci?",
+    descrizione: "Problema principale.",
+    opzioni: [
+      { id: "crespo", value: "crespo", label: "Crespo" },
+      { id: "poco-volume", value: "poco-volume", label: "Poco volume" },
+      { id: "secchezza", value: "secchezza", label: "Secchezza" },
+      { id: "nodi-districare", value: "nodi-districare", label: "Nodo e difficoltà a districarli" },
+      { id: "styling-dura-poco", value: "styling-dura-poco", label: "Styling che dura pochissimo" },
+      { id: "cute-grassa-prurito", value: "cute-grassa-prurito", label: "Cute grassa/prurito" },
+      { id: "non-capisco-cosa-usare", value: "non-capisco-cosa-usare", label: "Non capisco cosa usare" },
+    ],
+  },
+  {
+    id: "obiettivoDesiderato",
+    titolo: "7. Come vorresti che fossero i tuoi ricci?",
+    descrizione: "Obiettivo desiderato.",
+    opzioni: [
+      { id: "piu-definiti", value: "piu-definiti", label: "Più definiti" },
+      { id: "piu-voluminosi", value: "piu-voluminosi", label: "Più voluminosi" },
+      { id: "piu-morbidi", value: "piu-morbidi", label: "Più morbidi" },
+      { id: "piu-leggeri", value: "piu-leggeri", label: "Più leggeri" },
+      { id: "piu-facili", value: "piu-facili", label: "Più facili da gestire" },
+      { id: "piu-sani-forti", value: "piu-sani-forti", label: "Più sani e forti" },
+    ],
+  },
+] as const
 
 export type DomandaID =
-    | "cuoioCapelluto"
-    | "spessoreCapello"
-    | "porosita"
-    | "sts"
-    | "densita"
-    | "personalitaRicci";
-
+  | "guidaLavaggio"
+  | "porosita"
+  | "sts"
+  | "spessoreDensita"
+  | "personalitaRicci"
+  | "problemaPrincipale"
+  | "obiettivoDesiderato"

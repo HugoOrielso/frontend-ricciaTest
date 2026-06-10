@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
@@ -18,16 +18,16 @@ const TEXT_MID = "#72243E"    // pink-800
 const TEXT_SOFT = "#993556"   // pink-700
 
 const formSchema = z.object({
-    cuoioCapelluto: z.string({ required_error: "Seleziona una risposta" }),
-    spessoreCapello: z.string({ required_error: "Seleziona una risposta" }),
+    guidaLavaggio: z.string({ required_error: "Seleziona una risposta" }),
     porosita: z.string({ required_error: "Seleziona una risposta" }),
     sts: z.string({ required_error: "Seleziona una risposta" }),
-    densita: z.string({ required_error: "Seleziona una risposta" }),
+    spessoreDensita: z.string({ required_error: "Seleziona una risposta" }),
     personalitaRicci: z.string({ required_error: "Seleziona una risposta" }),
+    problemaPrincipale: z.string({ required_error: "Seleziona una risposta" }),
+    obiettivoDesiderato: z.string({ required_error: "Seleziona una risposta" }),
     email: z.string().email({ message: "Inserisci un indirizzo email valido" }),
     nome: z.string().min(1, { message: "Inserisci il tuo nome" }),
 })
-
 type FormValues = z.infer<typeof formSchema>
 
 const TestForm = () => {
@@ -55,19 +55,55 @@ const TestForm = () => {
     const form = useForm<FormValues>({
         resolver: zodResolver(formSchema),
         defaultValues: {
-            cuoioCapelluto: "", spessoreCapello: "", porosita: "",
-            sts: "", densita: "", personalitaRicci: "", email: "", nome: "",
+            guidaLavaggio: "",
+            porosita: "",
+            sts: "",
+            spessoreDensita: "",
+            personalitaRicci: "",
+            problemaPrincipale: "",
+            obiettivoDesiderato: "",
+            email: "",
+            nome: "",
         },
     })
 
+    useEffect(() => {
+        const sendHeight = () => {
+            const height = document.documentElement.scrollHeight
+
+            window.parent.postMessage(
+                {
+                    type: "RICCIA_IFRAME_HEIGHT",
+                    height,
+                },
+                "https://laragazzariccia.com"
+            )
+        }
+
+        sendHeight()
+
+        const observer = new ResizeObserver(sendHeight)
+        observer.observe(document.body)
+
+        window.addEventListener("load", sendHeight)
+        window.addEventListener("resize", sendHeight)
+
+        return () => {
+            observer.disconnect()
+            window.removeEventListener("load", sendHeight)
+            window.removeEventListener("resize", sendHeight)
+        }
+    }, [currentIndex, reply, prodottiTrovati.length])
+
     async function onSubmit(values: FormValues): Promise<void> {
         const requiredFields: Array<keyof FormValues> = [
-            "cuoioCapelluto",
-            "spessoreCapello",
+            "guidaLavaggio",
             "porosita",
             "sts",
-            "densita",
+            "spessoreDensita",
             "personalitaRicci",
+            "problemaPrincipale",
+            "obiettivoDesiderato",
         ]
 
         const missingFields = requiredFields.filter(f => !values[f])
@@ -241,9 +277,9 @@ const TestForm = () => {
 
                                         {/* Campos email/nome en la última pregunta */}
                                         {isLast && (
-                                            <div className="flex flex-col gap-3 pt-2">
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2">
                                                 <div className="flex flex-col gap-1">
-                                                    <label className=" font-medium" style={{ color: TEXT_MID }}>
+                                                    <label className="font-medium text-start" style={{ color: TEXT_MID }}>
                                                         La tua email *
                                                     </label>
                                                     <input
@@ -251,7 +287,7 @@ const TestForm = () => {
                                                         required
                                                         placeholder="nome@esempio.com"
                                                         {...form.register("email")}
-                                                        className="w-full rounded-xl px-4 py-2.5  outline-none transition-all"
+                                                        className="w-full rounded-xl px-4 py-2.5 outline-none transition-all"
                                                         style={{
                                                             border: `1.5px solid ${PINK_MID}`,
                                                             color: TEXT_DARK,
@@ -261,13 +297,14 @@ const TestForm = () => {
                                                         onBlur={e => e.target.style.borderColor = PINK_MID}
                                                     />
                                                     {form.formState.errors.email && (
-                                                        <p className="" style={{ color: PINK }}>
+                                                        <p className="text-sm" style={{ color: PINK }}>
                                                             {form.formState.errors.email.message}
                                                         </p>
                                                     )}
                                                 </div>
+
                                                 <div className="flex flex-col gap-1">
-                                                    <label className=" font-medium" style={{ color: TEXT_MID }}>
+                                                    <label className="font-medium text-start" style={{ color: TEXT_MID }}>
                                                         Il tuo nome *
                                                     </label>
                                                     <input
@@ -275,7 +312,7 @@ const TestForm = () => {
                                                         required
                                                         placeholder="Come ti chiami?"
                                                         {...form.register("nome")}
-                                                        className="w-full rounded-xl px-4 py-2.5  outline-none transition-all"
+                                                        className="w-full rounded-xl px-4 py-2.5 outline-none transition-all"
                                                         style={{
                                                             border: `1.5px solid ${PINK_MID}`,
                                                             color: TEXT_DARK,
@@ -285,7 +322,7 @@ const TestForm = () => {
                                                         onBlur={e => e.target.style.borderColor = PINK_MID}
                                                     />
                                                     {form.formState.errors.nome && (
-                                                        <p className="" style={{ color: PINK }}>
+                                                        <p className="text-sm" style={{ color: PINK }}>
                                                             {form.formState.errors.nome.message}
                                                         </p>
                                                     )}
