@@ -47,7 +47,7 @@ const Reply = ({
                 <span className="mt-0.5 flex-shrink-0 w-5 h-5 rounded-full bg-[#E92176]/10 text-[#E92176]  font-semibold flex items-center justify-center">
                   {i + 1}
                 </span>
-                <p className=" text-gray-700 leading-relaxed">{step.trim()}</p>
+                <p className="text-start text-gray-700 leading-relaxed">{step.trim()}</p>
               </li>
             ))}
           </ol>
