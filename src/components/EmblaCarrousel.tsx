@@ -42,7 +42,7 @@ const EmblaCarousel: React.FC<PropType> = (props) => {
                                     <h4 className="font-medium">{item.nome}</h4>
                                     <p className="text-sm text-gray-500"> {item.descrizione} </p>
 
-                                    <a href={item.link} className='flex items-center justify-center'>
+                                    <a href={item.link} target='_blank'  className='flex items-center justify-center'>
                                         <Package />
                                         <div  className="text-sm underline text-blue-500"> Acquista ora </div>
                                     </a>
