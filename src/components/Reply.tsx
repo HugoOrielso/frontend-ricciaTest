@@ -21,7 +21,7 @@ const Reply = ({
   const passi = righe.slice(1)
 
   return (
-    <div className="w-full max-w-4xl mx-auto px-2 py-6 animate-fadeIn">
+    <div className="w-full  mx-auto px-2 py-6 animate-fadeIn">
 
       {/* Badge header */}
       <div className="flex items-center gap-2 mb-4">
@@ -37,24 +37,24 @@ const Reply = ({
 
         {/* Colonna sinistra: testo routine */}
         <div className="flex-1 bg-white border border-[#E92176]/15 rounded-2xl p-5 shadow-sm">
-          <p className=" font-medium text-[#E92176] uppercase tracking-wide mb-3">
+          <p className="  font-medium text-[#E92176] uppercase tracking-wide mb-3">
             La tua routine
           </p>
-          <h3 className="text-sm font-semibold text-gray-800 mb-4">{titolo}</h3>
+          <h3 className=" font-semibold text-gray-800 mb-4">{titolo}</h3>
           <ol className="space-y-3">
             {passi.map((step, i) => (
               <li key={i} className="flex gap-3">
                 <span className="mt-0.5 flex-shrink-0 w-5 h-5 rounded-full bg-[#E92176]/10 text-[#E92176]  font-semibold flex items-center justify-center">
                   {i + 1}
                 </span>
-                <p className="text-sm text-gray-700 leading-relaxed">{step.trim()}</p>
+                <p className=" text-gray-700 leading-relaxed">{step.trim()}</p>
               </li>
             ))}
           </ol>
 
           <button
             onClick={ ()=> location.reload()}
-            className="mt-6 w-full text-sm border border-[#E92176]/40 text-[#E92176] hover:bg-[#E92176] hover:text-white transition-colors duration-200 px-4 py-2 rounded-lg cursor-pointer"
+            className="mt-6 w-full  border border-[#E92176]/40 text-[#E92176] hover:bg-[#E92176] hover:text-white transition-colors duration-200 px-4 py-2 rounded-lg cursor-pointer"
           >
             ← Rifai il test
           </button>
