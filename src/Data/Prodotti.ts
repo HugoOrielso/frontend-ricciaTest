@@ -6,13 +6,13 @@ export const prodottiDisponibili = [
     link: "https://laragazzariccia.com/products/kit-nutrimento-1",
   },
   {
-    nome: "RICCI PERFETTI",
+    nome: "Kit ricci perfetti",
     descrizione: "Kit composto da Shampoo Riccia + Balsamo Riccia",
     immagine: "https://laragazzariccia.com/cdn/shop/files/Progettosenzatitolo_22_1080x1080.jpg",
     link: "https://laragazzariccia.com/products/shampoo-balsamo-ricci-perfetti",
   },
   {
-    nome: "Kit Lavaggio Riccia BASE",
+    nome: "Lavaggio invertito + scrub",
     descrizione: "Un kit lavaggio essenziale per iniziare a prenderti cura dei tuoi capelli. Perchè i ricci belli non iniziano dallo styling, iniziano dal lavaggio.",
     immagine: "https://laragazzariccia.com/cdn/shop/files/ChatGPTImage23apr2026_12_33_23_1080x1080.png",
     link: "https://laragazzariccia.com/products/kit-lavaggio-riccia-essential",
