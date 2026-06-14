@@ -2,7 +2,7 @@ export const domandeCMR = [
   {
     id: "guidaLavaggio",
     titolo: "1. Dopo quanti giorni senti il bisogno di lavare i tuoi ricci?",
-    descrizione: "Guida al lavaggio: oleosità e frequenza.",
+    descrizione: "",
     opzioni: [
       { id: "dopo-1-giorno", value: "dopo-1-giorno", label: "Dopo 1 giorno" },
       { id: "dopo-2-3-giorni", value: "dopo-2-3-giorni", label: "Dopo 2-3 giorni" },

@@ -150,13 +150,22 @@ const TestForm = () => {
                 throw new Error(data?.message || "Errore durante l'iscrizione")
             }
 
-            // 3. Muestra el resultado en la UI
+            // Muestra el resultado en la UI siempre (la rutina ya está calculada)
             setReply(testo)
             setProdottiTrovati(prodotti)
 
-            toast.success("Test completato con successo", {
-                description: "La tua routine è pronta! Controlla la tua email.",
-            })
+            // Toast diferente si el email falló vs si llegó bien
+            if (data.emailError) {
+                toast.warning("Routine pronta, ma email non consegnata", {
+                    description:
+                        "Controlla che l'indirizzo email sia corretto. La tua routine è comunque visibile qui sotto.",
+                    duration: 6000,
+                })
+            } else {
+                toast.success("Test completato con successo!", {
+                    description: "La tua routine è pronta e ti abbiamo inviato un'email di riepilogo.",
+                })
+            }
         } catch (error) {
             console.error(error)
             toast.error("Ops, qualcosa è andato storto", {
