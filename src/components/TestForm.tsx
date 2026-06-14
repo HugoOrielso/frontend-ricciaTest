@@ -95,6 +95,9 @@ const TestForm = () => {
         }
     }, [currentIndex, reply, prodottiTrovati.length])
 
+    // ─── En TestForm.tsx, reemplaza solo el bloque onSubmit ──────────────────────
+    // Busca la función onSubmit y reemplázala por esta versión:
+
     async function onSubmit(values: FormValues): Promise<void> {
         const requiredFields: Array<keyof FormValues> = [
             "guidaLavaggio",
@@ -118,6 +121,10 @@ const TestForm = () => {
         try {
             setIsSubmitting(true)
 
+            // 1. Genera la rutina ANTES de llamar al backend
+            const { testo, prodotti } = generaRutina(values)
+
+            // 2. Llama al backend con todos los datos (Klaviyo + Resend)
             const response = await fetch(API_URL, {
                 method: "POST",
                 headers: {
@@ -126,6 +133,14 @@ const TestForm = () => {
                 body: JSON.stringify({
                     email: values.email,
                     name: values.nome,
+                    // Nuevos campos para el email:
+                    rutina: testo,
+                    prodotti: prodotti.map(p => ({
+                        nome: p.nome,
+                        descrizione: p.descrizione,
+                        immagine: p.immagine,
+                        link: p.link,
+                    })),
                 }),
             })
 
@@ -135,17 +150,15 @@ const TestForm = () => {
                 throw new Error(data?.message || "Errore durante l'iscrizione")
             }
 
-            const { testo, prodotti } = generaRutina(values)
-
+            // 3. Muestra el resultado en la UI
             setReply(testo)
             setProdottiTrovati(prodotti)
 
             toast.success("Test completato con successo", {
-                description: "La tua routine è pronta e la tua email è stata registrata.",
+                description: "La tua routine è pronta! Controlla la tua email.",
             })
         } catch (error) {
             console.error(error)
-
             toast.error("Ops, qualcosa è andato storto", {
                 description:
                     error instanceof Error
