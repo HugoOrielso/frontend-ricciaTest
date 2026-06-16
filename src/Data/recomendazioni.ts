@@ -10,6 +10,7 @@ type FormValues = {
   obiettivoDesiderato: string
   nome: string
   email: string
+  newsletterConsent?: boolean
 }
 
 type Prodotto = typeof prodottiDisponibili[number]
@@ -25,56 +26,26 @@ function addUnique(arr: Prodotto[], ...nomi: string[]) {
   }
 }
 
-function getLavaggio(values: FormValues): string {
-  const lavaggioFrequente =
-    values.guidaLavaggio === "dopo-1-giorno" ||
-    values.guidaLavaggio === "dopo-2-3-giorni"
-
+function getLavaggio(values: FormValues): { prodotto: string; testo: string } {
   const lavaggioDistante =
     values.guidaLavaggio === "dopo-4-5-giorni" ||
     values.guidaLavaggio === "una-settimana"
 
-  const capelliFini =
-    values.spessoreDensita === "fini-pochi" ||
-    values.spessoreDensita === "fini-tanti"
-
-  const stsStress =
-    values.sts === "stress-ormonali" ||
-    values.sts === "cuffie-casco-legati"
-
-  if (capelliFini && stsStress) {
-    return "Kit Lavaggio Riccia BASE"
-  }
-
   if (lavaggioDistante) {
-    return "RICCI PERFETTI"
+    return {
+      prodotto: "Kit Ricci Perfetti",
+      testo: "Lavaggio invertito con kit Ricci Perfetti",
+    }
   }
 
-  if (lavaggioFrequente) {
-    return "Kit Lavaggio Riccia BASE"
+  return {
+    prodotto: "Lavaggio invertito + scrub",
+    testo: "Lavaggio invertito con Kit Lavaggio Riccia + scrub",
   }
-
-  return "Kit Lavaggio Riccia BASE"
 }
 
-function getStyling(values: FormValues): string | null {
-  const capelliFini =
-    values.spessoreDensita === "fini-pochi" ||
-    values.spessoreDensita === "fini-tanti"
-
-  const capelliMedi = values.spessoreDensita === "medi-normali"
-
-  const serveVolume =
-    capelliFini ||
-    capelliMedi ||
-    values.problemaPrincipale === "poco-volume" ||
-    values.obiettivoDesiderato === "piu-voluminosi"
-
-  if (serveVolume) {
-    return "Kit Volume WOW"
-  }
-
-  return null
+function getStyling(): string {
+  return "Kit Volume WOW"
 }
 
 function getTrattamento(values: FormValues): string {
@@ -89,7 +60,6 @@ function getTrattamento(values: FormValues): string {
     values.spessoreDensita === "tantissimi-difficili"
 
   const stsChimico = values.sts === "colore-decolorazione-stiraggio"
-  const stsStress = values.sts === "stress-ormonali"
   const stsFarmaci = values.sts === "terapie-farmaci"
   const stsMeccanico = values.sts === "cuffie-casco-legati"
   const stsNessuno = values.sts === "nessuna"
@@ -122,7 +92,7 @@ function getTrattamento(values: FormValues): string {
   }
 
   if (stsChimico) return "Riparazione Proteica"
-  if (stsStress || stsFarmaci || stsMeccanico) return "Kit Riparazione"
+  if (stsFarmaci || stsMeccanico) return "Kit Riparazione"
 
   return "Kit Idratazione profonda"
 }
@@ -131,29 +101,19 @@ export function generaRutina(values: FormValues): { testo: string; prodotti: Pro
   const prodotti: Prodotto[] = []
 
   const lavaggio = getLavaggio(values)
-  const styling = getStyling(values)
+  const styling = getStyling()
   const trattamento = getTrattamento(values)
 
-  addUnique(prodotti, lavaggio)
+  addUnique(prodotti, lavaggio.prodotto, styling, trattamento)
 
-  if (styling) {
-    addUnique(prodotti, styling)
-  }
-
-  addUnique(prodotti, trattamento)
-
-  const passi: string[] = []
-
-  passi.push(`Lavaggio consigliato: ${lavaggio}.`)
-
-  if (styling) {
-    passi.push(`Styling consigliato: ${styling}.`)
-  }
-
-  passi.push(`Trattamento consigliato: ${trattamento}.`)
+  const passi = [
+    `Lavaggio: ${lavaggio.testo}`,
+    `Styling: ${styling}`,
+    `Trattamento: ${trattamento}`,
+  ]
 
   const testo =
-    `La tua routine personalizzata, ${values.nome}\n- ` + passi.join("\n- ")
+    `LA TUA ROUTINE PERSONALIZZATA, ${values.nome}\n- ` + passi.join("\n- ")
 
   return { testo, prodotti }
 }

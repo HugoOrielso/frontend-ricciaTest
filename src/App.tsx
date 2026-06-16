@@ -1,4 +1,3 @@
-import { Toaster } from 'sonner'
 import './App.css'
 import TestForm from './components/TestForm'
 import { useEffect } from 'react'
@@ -59,7 +58,6 @@ function App() {
   return (
     <div style={{ width: '100%', minHeight: '500px' }}>
       <TestForm />
-      <Toaster richColors />
     </div>
   )
 }

@@ -3,54 +3,50 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { toast } from 'sonner'
 import { domandeCMR, type DomandaID } from "./data"
 import { motion, AnimatePresence } from "motion/react"
-import { ArrowLeft, ArrowRight } from "lucide-react"
+import { ArrowLeft, ArrowRight, Mail } from "lucide-react"
 import Reply from "./Reply"
 import { generaRutina } from "@/Data/recomendazioni"
 
 const PINK = "#E92176"
 const PINK_LIGHT = "#fbeaf0"
 const PINK_MID = "#f4c0d1"
-const TEXT_DARK = "#4B1528"   // pink-900 — nunca negro puro
-const TEXT_MID = "#72243E"    // pink-800
-const TEXT_SOFT = "#993556"   // pink-700
+const TEXT_DARK = "#4B1528"
+const TEXT_MID = "#72243E"
+const TEXT_SOFT = "#993556"
+const PRIVACY_URL = "https://laragazzariccia.com/pages/privacy-policy"
 
 const formSchema = z.object({
-    guidaLavaggio: z.string({ required_error: "Seleziona una risposta" }),
-    porosita: z.string({ required_error: "Seleziona una risposta" }),
-    sts: z.string({ required_error: "Seleziona una risposta" }),
-    spessoreDensita: z.string({ required_error: "Seleziona una risposta" }),
-    personalitaRicci: z.string({ required_error: "Seleziona una risposta" }),
-    problemaPrincipale: z.string({ required_error: "Seleziona una risposta" }),
-    obiettivoDesiderato: z.string({ required_error: "Seleziona una risposta" }),
+    guidaLavaggio: z.string({ required_error: "Seleziona una risposta" }).min(1, "Seleziona una risposta"),
+    porosita: z.string({ required_error: "Seleziona una risposta" }).min(1, "Seleziona una risposta"),
+    sts: z.string({ required_error: "Seleziona una risposta" }).min(1, "Seleziona una risposta"),
+    spessoreDensita: z.string({ required_error: "Seleziona una risposta" }).min(1, "Seleziona una risposta"),
+    personalitaRicci: z.string({ required_error: "Seleziona una risposta" }).min(1, "Seleziona una risposta"),
+    problemaPrincipale: z.string({ required_error: "Seleziona una risposta" }).min(1, "Seleziona una risposta"),
+    obiettivoDesiderato: z.string({ required_error: "Seleziona una risposta" }).min(1, "Seleziona una risposta"),
     email: z.string().email({ message: "Inserisci un indirizzo email valido" }),
     nome: z.string().min(1, { message: "Inserisci il tuo nome" }),
+    newsletterConsent: z.boolean().optional(),
 })
 type FormValues = z.infer<typeof formSchema>
 
 const TestForm = () => {
     const API_URL = import.meta.env.VITE_API_URL
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
-    const [reply, setReply] = useState<string>('')
+    const [reply, setReply] = useState<string>("")
     const [prodottiTrovati, setProdottiTrovati] = useState<Prodotti[]>([])
     const [currentIndex, setCurrentIndex] = useState(0)
-    const domanda = domandeCMR[currentIndex]
-    const domandaId = domanda.id as DomandaID
     const [direction, setDirection] = useState<"left" | "right">("right")
+    const [formMessage, setFormMessage] = useState("")
 
+    const isLeadStep = currentIndex === domandeCMR.length
+    const domanda = isLeadStep ? null : domandeCMR[currentIndex]
+    const domandaId = domanda?.id as DomandaID | undefined
+    const totalSteps = domandeCMR.length + 1
     const isFirst = currentIndex === 0
-    const isLast = currentIndex === domandeCMR.length - 1
-    const progress = ((currentIndex + 1) / domandeCMR.length) * 100
-
-    const nextQuestion = () => {
-        if (!isLast) { setDirection("right"); setCurrentIndex(p => p + 1) }
-    }
-    const prevQuestion = () => {
-        if (!isFirst) { setDirection("left"); setCurrentIndex(p => p - 1) }
-    }
-    const resetTest = () => { setIsSubmitting(false); setReply('') }
+    const isLast = isLeadStep
+    const progress = ((currentIndex + 1) / totalSteps) * 100
 
     const form = useForm<FormValues>({
         resolver: zodResolver(formSchema),
@@ -64,6 +60,7 @@ const TestForm = () => {
             obiettivoDesiderato: "",
             email: "",
             nome: "",
+            newsletterConsent: false,
         },
     })
 
@@ -95,36 +92,42 @@ const TestForm = () => {
         }
     }, [currentIndex, reply, prodottiTrovati.length])
 
-    // ─── En TestForm.tsx, reemplaza solo el bloque onSubmit ──────────────────────
-    // Busca la función onSubmit y reemplázala por esta versión:
+    const nextQuestion = async () => {
+        setFormMessage("")
 
-    async function onSubmit(values: FormValues): Promise<void> {
-        const requiredFields: Array<keyof FormValues> = [
-            "guidaLavaggio",
-            "porosita",
-            "sts",
-            "spessoreDensita",
-            "personalitaRicci",
-            "problemaPrincipale",
-            "obiettivoDesiderato",
-        ]
+        if (isLeadStep || !domandaId) return
 
-        const missingFields = requiredFields.filter(f => !values[f])
-
-        if (missingFields.length > 0) {
-            toast.message("Campi obbligatori mancanti", {
-                description: "Per favore, seleziona un'opzione per ogni domanda.",
-            })
+        const isValid = await form.trigger(domandaId)
+        if (!isValid) {
+            setFormMessage("Seleziona una risposta per continuare.")
             return
         }
+
+        setDirection("right")
+        setCurrentIndex(p => Math.min(p + 1, domandeCMR.length))
+    }
+
+    const prevQuestion = () => {
+        if (!isFirst) {
+            setFormMessage("")
+            setDirection("left")
+            setCurrentIndex(p => p - 1)
+        }
+    }
+
+    const resetTest = () => {
+        setIsSubmitting(false)
+        setReply("")
+    }
+
+    async function onSubmit(values: FormValues): Promise<void> {
+        setFormMessage("")
 
         try {
             setIsSubmitting(true)
 
-            // 1. Genera la rutina ANTES de llamar al backend
             const { testo, prodotti } = generaRutina(values)
 
-            // 2. Llama al backend con todos los datos (Klaviyo + Resend)
             const response = await fetch(API_URL, {
                 method: "POST",
                 headers: {
@@ -133,7 +136,7 @@ const TestForm = () => {
                 body: JSON.stringify({
                     email: values.email,
                     name: values.nome,
-                    // Nuevos campos para el email:
+                    newsletterConsent: values.newsletterConsent,
                     rutina: testo,
                     prodotti: prodotti.map(p => ({
                         nome: p.nome,
@@ -150,72 +153,40 @@ const TestForm = () => {
                 throw new Error(data?.message || "Errore durante l'iscrizione")
             }
 
-            // Muestra el resultado en la UI siempre (la rutina ya está calculada)
             setReply(testo)
             setProdottiTrovati(prodotti)
-
-            // Toast diferente si el email falló vs si llegó bien
-            if (data.emailError) {
-                toast.warning("Routine pronta, ma email non consegnata", {
-                    description:
-                        "Controlla che l'indirizzo email sia corretto. La tua routine è comunque visibile qui sotto.",
-                    duration: 6000,
-                })
-            } else {
-                toast.success("Test completato con successo!", {
-                    description: "La tua routine è pronta e ti abbiamo inviato un'email di riepilogo.",
-                })
-            }
         } catch (error) {
-            console.error(error)
-            toast.error("Ops, qualcosa è andato storto", {
-                description:
-                    error instanceof Error
-                        ? error.message
-                        : "Non siamo riusciti a completare l'iscrizione.",
-            })
+            setFormMessage(error instanceof Error ? error.message : "Si è verificato un errore. Riprova.")
         } finally {
             setIsSubmitting(false)
         }
     }
 
     return (
-        <div className="min-h-screen w-full flex items-start justify-center ">
+        <div className="min-h-screen w-full flex items-start justify-center">
             <div className="flex flex-col gap-2">
-
-                <div>
-                </div>
                 {reply.length === 0 && (
                     <form
                         onSubmit={form.handleSubmit(onSubmit)}
-                        className="w-full "
+                        className="w-full"
                     >
-                        {/* Card principal */}
-                        <div className="bg-white rounded-3xl shadow-sm "
-                            style={{ border: `1px solid ${PINK_MID}` }}>
-
-                            {/* Header */}
-                            <div className="px-6 pt-6 pb-4"
-                                style={{ borderBottom: `1px solid ${PINK_LIGHT}` }}>
+                        <div className="bg-white rounded-3xl shadow-sm" style={{ border: `1px solid ${PINK_MID}` }}>
+                            <div className="px-6 pt-6 pb-4" style={{ borderBottom: `1px solid ${PINK_LIGHT}` }}>
                                 <div className="flex items-center gap-2 mb-1">
-                                    {/* Icono ricci decorativo */}
-                                    <div className="w-7 h-7 rounded-full flex items-center justify-center"
-                                        style={{ background: PINK }}>
+                                    <div className="w-7 h-7 rounded-full flex items-center justify-center" style={{ background: PINK }}>
                                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round">
                                             <path d="M12 2a5 5 0 0 1 5 5c0 3-2 5-5 8-3-3-5-5-5-8a5 5 0 0 1 5-5z" />
                                         </svg>
                                     </div>
-                                    <h1 className="text-base font-semibold"
-                                        style={{ color: TEXT_DARK }}>
+                                    <h1 className="text-base font-semibold" style={{ color: TEXT_DARK }}>
                                         Conosco i Miei Ricci
                                     </h1>
                                 </div>
-                                <p className="" style={{ color: TEXT_SOFT }}>
+                                <p style={{ color: TEXT_SOFT }}>
                                     Compila il test e scopri i prodotti più adatti ai tuoi ricci
                                 </p>
                             </div>
 
-                            {/* Barra progreso */}
                             <div className="h-1 w-full" style={{ background: PINK_LIGHT }}>
                                 <div
                                     className="h-1 transition-all duration-500"
@@ -223,20 +194,18 @@ const TestForm = () => {
                                 />
                             </div>
 
-                            {/* Contador pasos */}
                             <div className="flex justify-between items-center px-6 pt-4">
-                                <span className=" font-medium" style={{ color: TEXT_SOFT }}>
-                                    Domanda {currentIndex + 1} di {domandeCMR.length}
+                                <span className="font-medium" style={{ color: TEXT_SOFT }}>
+                                    {isLeadStep ? "Invio risultato" : `Domanda ${currentIndex + 1} di ${domandeCMR.length}`}
                                 </span>
                                 <div className="flex gap-1">
-                                    {domandeCMR.map((_, i) => (
+                                    {Array.from({ length: totalSteps }).map((_, i) => (
                                         <div key={i} className="w-1.5 h-1.5 rounded-full transition-all duration-300"
                                             style={{ background: i <= currentIndex ? PINK : PINK_MID }} />
                                     ))}
                                 </div>
                             </div>
 
-                            {/* Contenido animado */}
                             <div className="px-6 pt-4 pb-2 min-h-[280px]">
                                 <AnimatePresence mode="wait">
                                     <motion.div
@@ -247,145 +216,182 @@ const TestForm = () => {
                                         transition={{ duration: 0.25, ease: "easeOut" }}
                                         className="flex flex-col gap-4"
                                     >
-                                        <div>
-                                            <h2 className="text-start font-semibold mb-1"
-                                                style={{ color: TEXT_DARK }}>
-                                                {domanda.titolo}
-                                            </h2>
-                                            <p className="text-start leading-relaxed"
-                                                style={{ color: TEXT_MID }}>
-                                                {domanda.descrizione}
-                                                <span style={{ color: PINK, marginLeft: 2 }}>*</span>
-                                            </p>
-                                        </div>
+                                        {!isLeadStep && domanda && domandaId && (
+                                            <>
+                                                <div>
+                                                    <h2 className="text-start font-semibold mb-1" style={{ color: TEXT_DARK }}>
+                                                        {domanda.titolo}
+                                                    </h2>
+                                                    {domanda.descrizione && (
+                                                        <p className="text-start leading-relaxed" style={{ color: TEXT_MID }}>
+                                                            {domanda.descrizione}
+                                                        </p>
+                                                    )}
+                                                </div>
 
-                                        <RadioGroup
-                                            value={form.watch(domandaId)}
-                                            onValueChange={(v) => form.setValue(domandaId, v)}
-                                            className="flex flex-col gap-2"
-                                        >
-                                            {domanda.opzioni.map((opzione) => {
-                                                const checked = form.watch(domandaId) === opzione.value
-                                                return (
-                                                    <label
-                                                        key={opzione.id}
-                                                        htmlFor={opzione.id}
-                                                        className="flex items-center gap-3 rounded-xl p-5 cursor-pointer transition-all duration-150"
-                                                        style={{
-                                                            border: `1.5px solid ${checked ? PINK : PINK_MID}`,
-                                                            background: checked ? PINK_LIGHT : "white",
-                                                        }}
-                                                    >
-                                                        <RadioGroupItem
-                                                            value={opzione.value}
-                                                            id={opzione.id}
-                                                            className="shrink-0 size-6"
-                                                            style={{ accentColor: PINK, color: PINK, borderColor: PINK } as React.CSSProperties}
-                                                        />
-                                                        <span className="text-start leading-snug"
-                                                            style={{ color: checked ? TEXT_DARK : TEXT_MID }}>
-                                                            {opzione.label}
-                                                        </span>
-                                                    </label>
-                                                )
-                                            })}
-                                        </RadioGroup>
+                                                <RadioGroup
+                                                    value={form.watch(domandaId)}
+                                                    onValueChange={(v) => {
+                                                        form.setValue(domandaId, v, { shouldValidate: true })
+                                                        setFormMessage("")
+                                                    }}
+                                                    className="flex flex-col gap-2"
+                                                >
+                                                    {domanda.opzioni.map((opzione) => {
+                                                        const checked = form.watch(domandaId) === opzione.value
+                                                        return (
+                                                            <label
+                                                                key={opzione.id}
+                                                                htmlFor={opzione.id}
+                                                                className="flex items-center gap-3 rounded-xl p-5 cursor-pointer transition-all duration-150"
+                                                                style={{
+                                                                    border: `1.5px solid ${checked ? PINK : PINK_MID}`,
+                                                                    background: checked ? PINK_LIGHT : "white",
+                                                                }}
+                                                            >
+                                                                <RadioGroupItem
+                                                                    value={opzione.value}
+                                                                    id={opzione.id}
+                                                                    className="shrink-0 size-6"
+                                                                    style={{ accentColor: PINK, color: PINK, borderColor: PINK } as React.CSSProperties}
+                                                                />
+                                                                <span className="text-start leading-snug" style={{ color: checked ? TEXT_DARK : TEXT_MID }}>
+                                                                    {opzione.label}
+                                                                </span>
+                                                            </label>
+                                                        )
+                                                    })}
+                                                </RadioGroup>
 
-                                        {form.formState.errors[domandaId] && (
-                                            <p className="" style={{ color: PINK }}>
-                                                {form.formState.errors[domandaId]?.message}
-                                            </p>
+                                                {form.formState.errors[domandaId] && (
+                                                    <p style={{ color: PINK }}>
+                                                        {form.formState.errors[domandaId]?.message}
+                                                    </p>
+                                                )}
+                                            </>
                                         )}
 
-                                        {/* Campos email/nome en la última pregunta */}
-                                        {isLast && (
-                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2">
-                                                <div className="flex flex-col gap-1">
-                                                    <label className="font-medium text-start" style={{ color: TEXT_MID }}>
-                                                        La tua email *
-                                                    </label>
-                                                    <input
-                                                        type="email"
-                                                        required
-                                                        placeholder="nome@esempio.com"
-                                                        {...form.register("email")}
-                                                        className="w-full rounded-xl px-4 py-2.5 outline-none transition-all"
-                                                        style={{
-                                                            border: `1.5px solid ${PINK_MID}`,
-                                                            color: TEXT_DARK,
-                                                            background: "white",
-                                                        }}
-                                                        onFocus={e => e.target.style.borderColor = PINK}
-                                                        onBlur={e => e.target.style.borderColor = PINK_MID}
-                                                    />
-                                                    {form.formState.errors.email && (
-                                                        <p className="text-sm" style={{ color: PINK }}>
-                                                            {form.formState.errors.email.message}
+                                        {isLeadStep && (
+                                            <div className="flex flex-col gap-4">
+                                                <div className="space-y-3 text-start">
+                                                    <h2 className="text-xl font-semibold" style={{ color: TEXT_DARK }}>
+                                                        🩷 La tua routine è pronta
+                                                    </h2>
+                                                    <p style={{ color: TEXT_MID }}>
+                                                        In base alle tue risposte abbiamo identificato:
+                                                    </p>
+                                                    <div className="space-y-2" style={{ color: TEXT_MID }}>
+                                                        <p>✔ Il comportamento della tua cute</p>
+                                                        <p>✔ Le esigenze dei tuoi ricci</p>
+                                                        <p>✔ Il tipo di trattamento più adatto ai tuoi capelli</p>
+                                                        <p>✔ I prodotti che potrebbero aiutarti a ottenere il risultato che desideri</p>
+                                                    </div>
+                                                    <div>
+                                                        <p className="font-semibold" style={{ color: TEXT_DARK }}>
+                                                            Dove possiamo inviarti il risultato?
                                                         </p>
-                                                    )}
+                                                        <p style={{ color: TEXT_MID }}>
+                                                            Inserisci il tuo nome e la tua email e riceverai subito la tua routine personalizzata.
+                                                        </p>
+                                                    </div>
                                                 </div>
 
-                                                <div className="flex flex-col gap-1">
-                                                    <label className="font-medium text-start" style={{ color: TEXT_MID }}>
-                                                        Il tuo nome *
-                                                    </label>
-                                                    <input
-                                                        type="text"
-                                                        required
-                                                        placeholder="Come ti chiami?"
-                                                        {...form.register("nome")}
-                                                        className="w-full rounded-xl px-4 py-2.5 outline-none transition-all"
-                                                        style={{
-                                                            border: `1.5px solid ${PINK_MID}`,
-                                                            color: TEXT_DARK,
-                                                            background: "white",
-                                                        }}
-                                                        onFocus={e => e.target.style.borderColor = PINK}
-                                                        onBlur={e => e.target.style.borderColor = PINK_MID}
-                                                    />
-                                                    {form.formState.errors.nome && (
-                                                        <p className="text-sm" style={{ color: PINK }}>
-                                                            {form.formState.errors.nome.message}
-                                                        </p>
-                                                    )}
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                                    <div className="flex flex-col gap-1">
+                                                        <label className="font-medium text-start" style={{ color: TEXT_MID }}>
+                                                            Nome
+                                                        </label>
+                                                        <input
+                                                            type="text"
+                                                            required
+                                                            placeholder="Nome"
+                                                            {...form.register("nome")}
+                                                            className="w-full rounded-xl px-4 py-2.5 outline-none transition-all"
+                                                            style={{ border: `1.5px solid ${PINK_MID}`, color: TEXT_DARK, background: "white" }}
+                                                            onFocus={e => e.target.style.borderColor = PINK}
+                                                            onBlur={e => e.target.style.borderColor = PINK_MID}
+                                                        />
+                                                        {form.formState.errors.nome && (
+                                                            <p className="text-sm" style={{ color: PINK }}>
+                                                                {form.formState.errors.nome.message}
+                                                            </p>
+                                                        )}
+                                                    </div>
+
+                                                    <div className="flex flex-col gap-1">
+                                                        <label className="font-medium text-start" style={{ color: TEXT_MID }}>
+                                                            Email
+                                                        </label>
+                                                        <input
+                                                            type="email"
+                                                            required
+                                                            placeholder="Email"
+                                                            {...form.register("email")}
+                                                            className="w-full rounded-xl px-4 py-2.5 outline-none transition-all"
+                                                            style={{ border: `1.5px solid ${PINK_MID}`, color: TEXT_DARK, background: "white" }}
+                                                            onFocus={e => e.target.style.borderColor = PINK}
+                                                            onBlur={e => e.target.style.borderColor = PINK_MID}
+                                                        />
+                                                        {form.formState.errors.email && (
+                                                            <p className="text-sm" style={{ color: PINK }}>
+                                                                {form.formState.errors.email.message}
+                                                            </p>
+                                                        )}
+                                                    </div>
                                                 </div>
+
+                                                <p className="text-sm leading-relaxed text-start" style={{ color: TEXT_SOFT }}>
+                                                    Inserendo la tua email riceverai la tua routine personalizzata e confermi di aver letto la{" "}
+                                                    <a href={PRIVACY_URL} target="_blank" rel="noreferrer" className="font-semibold underline" style={{ color: PINK }}>
+                                                        Privacy Policy
+                                                    </a>.
+                                                </p>
+
+                                                <label className="flex items-start gap-3 text-start cursor-pointer" style={{ color: TEXT_MID }}>
+                                                    <input
+                                                        type="checkbox"
+                                                        {...form.register("newsletterConsent")}
+                                                        className="mt-1 h-4 w-4"
+                                                        style={{ accentColor: PINK }}
+                                                    />
+                                                    <span>Voglio ricevere consigli pratici per prendermi cura dei miei ricci.</span>
+                                                </label>
                                             </div>
+                                        )}
+
+                                        {formMessage && (
+                                            <p className="rounded-xl px-4 py-3 text-start" style={{ color: PINK, background: PINK_LIGHT }}>
+                                                {formMessage}
+                                            </p>
                                         )}
                                     </motion.div>
                                 </AnimatePresence>
                             </div>
 
-                            {/* Spinner enviando */}
                             {isSubmitting && (
-                                <div className="mx-6 mb-4 rounded-2xl p-5 text-center"
-                                    style={{ background: PINK_LIGHT, border: `1px solid ${PINK_MID}` }}>
+                                <div className="mx-6 mb-4 rounded-2xl p-5 text-center" style={{ background: PINK_LIGHT, border: `1px solid ${PINK_MID}` }}>
                                     <div className="flex flex-col items-center gap-3">
                                         <div className="w-10 h-10 rounded-full border-[3px] border-t-transparent animate-spin"
                                             style={{ borderColor: `${PINK_MID} ${PINK_MID} ${PINK_MID} transparent` }} />
                                         <p className="text-sm font-medium" style={{ color: TEXT_DARK }}>
                                             Creiamo la tua routine...
                                         </p>
-                                        <p className="" style={{ color: TEXT_SOFT }}>
+                                        <p style={{ color: TEXT_SOFT }}>
                                             Analizziamo le tue risposte
                                         </p>
                                     </div>
                                 </div>
                             )}
 
-                            {/* Footer: navegación + submit */}
                             {!isSubmitting && (
                                 <div className="px-6 pb-6 pt-2 flex flex-col gap-3">
-                                    <div className="flex justify-between">
+                                    <div className="flex justify-between gap-3">
                                         <button
                                             type="button"
                                             onClick={prevQuestion}
                                             disabled={isFirst}
                                             className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-150 disabled:opacity-30"
-                                            style={{
-                                                border: `1.5px solid ${PINK_MID}`,
-                                                color: TEXT_MID,
-                                                background: "white",
-                                            }}
+                                            style={{ border: `1.5px solid ${PINK_MID}`, color: TEXT_MID, background: "white" }}
                                         >
                                             <ArrowLeft size={14} /> Indietro
                                         </button>
@@ -405,10 +411,8 @@ const TestForm = () => {
                                                 className="flex items-center gap-1.5 px-5 py-2 rounded-xl text-sm font-semibold transition-all duration-150"
                                                 style={{ background: PINK, color: "white" }}
                                             >
-                                                Scopri la tua routine
-                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                                                    <path d="M5 12h14M12 5l7 7-7 7" />
-                                                </svg>
+                                                <Mail size={16} />
+                                                📩 Inviami la mia routine
                                             </button>
                                         )}
                                     </div>

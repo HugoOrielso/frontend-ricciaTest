@@ -6,6 +6,7 @@ import "../assets/embla.css"
 const Reply = ({
   message,
   prodotti,
+  resetTest,
 }: {
   message: string
   prodotti: Prodotti[]
@@ -20,11 +21,10 @@ const Reply = ({
   return (
     <div className="w-full max-w-5xl mx-auto px-3 py-4 animate-fadeIn">
       <div className="bg-white border border-[#E92176]/20 rounded-3xl shadow-sm overflow-hidden">
-
         <div className="px-5 py-4 border-b border-[#E92176]/10 bg-pink-50/40">
           <div className="flex flex-wrap items-center gap-2">
             <span className="inline-flex items-center gap-1 bg-[#E92176] text-white text-sm font-semibold px-3 py-1 rounded-full">
-              ✓ Personalizzato
+              Personalizzato
             </span>
             <span className="text-sm font-medium text-pink-800">
               La tua routine per capelli ricci
@@ -56,10 +56,10 @@ const Reply = ({
             </ol>
 
             <button
-              onClick={() => location.reload()}
+              onClick={resetTest}
               className="mt-5 w-full sm:w-auto border border-[#E92176]/40 text-[#E92176] hover:bg-[#E92176] hover:text-white transition-colors duration-200 px-5 py-2.5 rounded-xl cursor-pointer font-medium"
             >
-              ← Rifai il test
+              Rifai il test
             </button>
           </div>
 
