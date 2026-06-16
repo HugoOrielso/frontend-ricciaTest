@@ -27,7 +27,9 @@ const formSchema = z.object({
     obiettivoDesiderato: z.string({ required_error: "Seleziona una risposta" }).min(1, "Seleziona una risposta"),
     email: z.string().email({ message: "Inserisci un indirizzo email valido" }),
     nome: z.string().min(1, { message: "Inserisci il tuo nome" }),
-    newsletterConsent: z.boolean().optional(),
+    newsletterConsent: z.boolean().refine(value => value, {
+        message: "Devi selezionare questa opzione per ricevere la tua routine.",
+    }),
 })
 type FormValues = z.infer<typeof formSchema>
 
@@ -115,10 +117,6 @@ const TestForm = () => {
         }
     }
 
-    const resetTest = () => {
-        setIsSubmitting(false)
-        setReply("")
-    }
 
     async function onSubmit(values: FormValues): Promise<void> {
         setFormMessage("")
@@ -274,9 +272,9 @@ const TestForm = () => {
                                         {isLeadStep && (
                                             <div className="flex flex-col gap-4">
                                                 <div className="space-y-3 text-start">
-                                                    <h2 className="text-xl font-semibold" style={{ color: TEXT_DARK }}>
+                                                    <h1 className="text-4xl lg:text-5xl font-semibold" style={{ color: TEXT_DARK }}>
                                                         🩷 La tua routine è pronta
-                                                    </h2>
+                                                    </h1>
                                                     <p style={{ color: TEXT_MID }}>
                                                         In base alle tue risposte abbiamo identificato:
                                                     </p>
@@ -340,22 +338,28 @@ const TestForm = () => {
                                                     </div>
                                                 </div>
 
-                                                <p className="text-sm leading-relaxed text-start" style={{ color: TEXT_SOFT }}>
+                                                <p className="leading-relaxed text-start" style={{ color: TEXT_SOFT }}>
                                                     Inserendo la tua email riceverai la tua routine personalizzata e confermi di aver letto la{" "}
                                                     <a href={PRIVACY_URL} target="_blank" rel="noreferrer" className="font-semibold underline" style={{ color: PINK }}>
                                                         Privacy Policy
                                                     </a>.
                                                 </p>
 
-                                                <label className="flex items-start gap-3 text-start cursor-pointer" style={{ color: TEXT_MID }}>
+                                                <label className="flex items-center text-center gap-3  cursor-pointer" style={{ color: TEXT_MID }}>
                                                     <input
                                                         type="checkbox"
                                                         {...form.register("newsletterConsent")}
+                                                        required
                                                         className="mt-1 h-4 w-4"
                                                         style={{ accentColor: PINK }}
                                                     />
                                                     <span>Voglio ricevere consigli pratici per prendermi cura dei miei ricci.</span>
                                                 </label>
+                                                {form.formState.errors.newsletterConsent && (
+                                                    <p className="text-sm text-start" style={{ color: PINK }}>
+                                                        {form.formState.errors.newsletterConsent.message}
+                                                    </p>
+                                                )}
                                             </div>
                                         )}
 
@@ -390,7 +394,7 @@ const TestForm = () => {
                                             type="button"
                                             onClick={prevQuestion}
                                             disabled={isFirst}
-                                            className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-150 disabled:opacity-30"
+                                            className="flex items-center gap-1.5 px-4 py-2 rounded-xl font-medium transition-all duration-150 disabled:opacity-30 cursor-pointer"
                                             style={{ border: `1.5px solid ${PINK_MID}`, color: TEXT_MID, background: "white" }}
                                         >
                                             <ArrowLeft size={14} /> Indietro
@@ -400,7 +404,7 @@ const TestForm = () => {
                                             <button
                                                 type="button"
                                                 onClick={nextQuestion}
-                                                className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-150"
+                                                className="flex items-center gap-1.5 px-4 py-2 rounded-xl font-medium transition-all duration-150 cursor-pointer"
                                                 style={{ background: PINK, color: "white" }}
                                             >
                                                 Avanti <ArrowRight size={14} />
@@ -408,11 +412,11 @@ const TestForm = () => {
                                         ) : (
                                             <button
                                                 type="submit"
-                                                className="flex items-center gap-1.5 px-5 py-2 rounded-xl text-sm font-semibold transition-all duration-150"
+                                                className="flex items-center gap-1.5 px-5 py-2 rounded-xl font-semibold transition-all duration-150 cursor-pointer"
                                                 style={{ background: PINK, color: "white" }}
                                             >
                                                 <Mail size={16} />
-                                                📩 Inviami la mia routine
+                                                Inviami la mia routine
                                             </button>
                                         )}
                                     </div>
@@ -423,7 +427,7 @@ const TestForm = () => {
                 )}
             </div>
             {reply.length > 0 && (
-                <Reply message={reply} prodotti={prodottiTrovati} resetTest={resetTest} />
+                <Reply message={reply} prodotti={prodottiTrovati}  />
             )}
         </div>
     )

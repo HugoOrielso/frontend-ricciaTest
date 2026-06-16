@@ -19,8 +19,10 @@ function getProdotto(nome: string): Prodotto | undefined {
   return prodottiDisponibili.find(p => p.nome === nome)
 }
 
-function addUnique(arr: Prodotto[], ...nomi: string[]) {
+function addUnique(arr: Prodotto[], ...nomi: Array<string | undefined>) {
   for (const nome of nomi) {
+    if (!nome) continue
+
     const p = getProdotto(nome)
     if (p && !arr.find(x => x.nome === nome)) arr.push(p)
   }
@@ -44,8 +46,13 @@ function getLavaggio(values: FormValues): { prodotto: string; testo: string } {
   }
 }
 
-function getStyling(): string {
-  return "Kit Volume WOW"
+function getStyling(values: FormValues): string | undefined {
+  const stylingConVolume =
+    values.spessoreDensita === "fini-pochi" ||
+    values.spessoreDensita === "fini-tanti" ||
+    values.spessoreDensita === "medi-normali"
+
+  return stylingConVolume ? "Kit Volume WOW" : undefined
 }
 
 function getTrattamento(values: FormValues): string {
@@ -101,16 +108,16 @@ export function generaRutina(values: FormValues): { testo: string; prodotti: Pro
   const prodotti: Prodotto[] = []
 
   const lavaggio = getLavaggio(values)
-  const styling = getStyling()
+  const styling = getStyling(values)
   const trattamento = getTrattamento(values)
 
   addUnique(prodotti, lavaggio.prodotto, styling, trattamento)
 
   const passi = [
     `Lavaggio: ${lavaggio.testo}`,
-    `Styling: ${styling}`,
+    styling ? `Styling: ${styling}` : undefined,
     `Trattamento: ${trattamento}`,
-  ]
+  ].filter((passo): passo is string => Boolean(passo))
 
   const testo =
     `LA TUA ROUTINE PERSONALIZZATA, ${values.nome}\n- ` + passi.join("\n- ")

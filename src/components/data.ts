@@ -16,8 +16,8 @@ export const domandeCMR = [
     descrizione: "",
     opzioni: [
       { id: "assorbono-secchi-crespi", value: "assorbono-secchi-crespi", label: "Assorbono subito tutto ma restano comunque secchi o crespi" },
-      { id: "tanto-prodotto", value: "tanto-prodotto", label: "Devono assorbire tanto prodotto prima di diventare morbidi" },
-      { id: "effetto-cartone", value: "effetto-cartone", label: "Appena li bagno sembrano duri, effetto cartone" },
+      { id: "tanto-prodotto", value: "tanto-prodotto", label: "Prima di diventare morbidi, metto tanto prodotto" },
+      { id: "effetto-cartone", value: "effetto-cartone", label: `Appena li bagno sembrano duri, effetto "cartone"` },
       { id: "subito-morbidi-setosi", value: "subito-morbidi-setosi", label: "Con poco prodotto diventano subito morbidi e setosi" },
     ],
   },
@@ -38,7 +38,7 @@ export const domandeCMR = [
     descrizione: "",
     opzioni: [
       { id: "fini-pochi", value: "fini-pochi", label: "Fini e pochi" },
-      { id: "fini-tanti", value: "fini-tanti", label: "Fini ma tanti" },
+      { id: "fini-tanti", value: "fini-tanti", label: "Fini e tanti" },
       { id: "medi-normali", value: "medi-normali", label: "Medi e normali" },
       { id: "grossi-voluminosi", value: "grossi-voluminosi", label: "Grossi e voluminosi" },
       { id: "tantissimi-difficili", value: "tantissimi-difficili", label: "Tantissimi e difficili da gestire" },
