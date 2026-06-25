@@ -33,6 +33,19 @@ const formSchema = z.object({
 })
 type FormValues = z.infer<typeof formSchema>
 
+const buildQuizAnswers = (values: FormValues) =>
+    domandeCMR.map(domanda => {
+        const value = values[domanda.id]
+        const selectedOption = domanda.opzioni.find(opzione => opzione.value === value)
+
+        return {
+            id: domanda.id,
+            question: domanda.titolo,
+            value,
+            label: selectedOption?.label ?? value,
+        }
+    })
+
 const TestForm = () => {
     const API_URL = import.meta.env.VITE_API_URL
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
@@ -157,6 +170,7 @@ const TestForm = () => {
                     email: values.email,
                     name: values.nome,
                     newsletterConsent: values.newsletterConsent,
+                    quizAnswers: buildQuizAnswers(values),
                     rutina: testo,
                     prodotti: prodotti.map(p => ({
                         nome: p.nome,
