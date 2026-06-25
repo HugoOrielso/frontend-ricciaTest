@@ -5,7 +5,7 @@ import * as z from "zod"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { domandeCMR, type DomandaID } from "./data"
 import { motion, AnimatePresence } from "motion/react"
-import { ArrowLeft, ArrowRight, Mail } from "lucide-react"
+import { ArrowLeft, ArrowRight, Check, Mail, Pencil } from "lucide-react"
 import Reply from "./Reply"
 import { generaRutina } from "@/Data/recomendazioni"
 
@@ -41,13 +41,14 @@ const TestForm = () => {
     const [currentIndex, setCurrentIndex] = useState(0)
     const [direction, setDirection] = useState<"left" | "right">("right")
     const [formMessage, setFormMessage] = useState("")
+    const [isConfirmingLead, setIsConfirmingLead] = useState(false)
 
     const isLeadStep = currentIndex === domandeCMR.length
     const domanda = isLeadStep ? null : domandeCMR[currentIndex]
     const domandaId = domanda?.id as DomandaID | undefined
     const totalSteps = domandeCMR.length + 1
     const isFirst = currentIndex === 0
-    const isLast = isLeadStep
+    const isLast = isLeadStep || isConfirmingLead
     const progress = ((currentIndex + 1) / totalSteps) * 100
 
     const form = useForm<FormValues>({
@@ -92,7 +93,7 @@ const TestForm = () => {
             window.removeEventListener("load", sendHeight)
             window.removeEventListener("resize", sendHeight)
         }
-    }, [currentIndex, reply, prodottiTrovati.length])
+    }, [currentIndex, reply, prodottiTrovati.length, isConfirmingLead])
 
     const nextQuestion = async () => {
         setFormMessage("")
@@ -110,6 +111,13 @@ const TestForm = () => {
     }
 
     const prevQuestion = () => {
+        if (isConfirmingLead) {
+            setFormMessage("")
+            setDirection("left")
+            setIsConfirmingLead(false)
+            return
+        }
+
         if (!isFirst) {
             setFormMessage("")
             setDirection("left")
@@ -118,7 +126,21 @@ const TestForm = () => {
     }
 
 
-    async function onSubmit(values: FormValues): Promise<void> {
+    async function onSubmit(): Promise<void> {
+        setFormMessage("")
+        setDirection("right")
+        setIsConfirmingLead(true)
+    }
+
+    async function submitConfirmed(): Promise<void> {
+        const isValid = await form.trigger(["nome", "email", "newsletterConsent"])
+        if (!isValid) {
+            setDirection("left")
+            setIsConfirmingLead(false)
+            return
+        }
+
+        const values = form.getValues()
         setFormMessage("")
 
         try {
@@ -160,6 +182,12 @@ const TestForm = () => {
         }
     }
 
+    const editLeadData = () => {
+        setFormMessage("")
+        setDirection("left")
+        setIsConfirmingLead(false)
+    }
+
     return (
         <div className="min-h-screen w-full flex items-start justify-center">
             <div className="flex flex-col gap-2">
@@ -194,7 +222,7 @@ const TestForm = () => {
 
                             <div className="flex justify-between items-center px-6 pt-4">
                                 <span className="font-medium" style={{ color: TEXT_SOFT }}>
-                                    {isLeadStep ? "Invio risultato" : `Domanda ${currentIndex + 1} di ${domandeCMR.length}`}
+                                    {isConfirmingLead ? "Conferma dati" : isLeadStep ? "Invio risultato" : `Domanda ${currentIndex + 1} di ${domandeCMR.length}`}
                                 </span>
                                 <div className="flex gap-1">
                                     {Array.from({ length: totalSteps }).map((_, i) => (
@@ -207,7 +235,7 @@ const TestForm = () => {
                             <div className="px-6 pt-4 pb-2 min-h-[280px]">
                                 <AnimatePresence mode="wait">
                                     <motion.div
-                                        key={currentIndex}
+                                        key={isConfirmingLead ? "confirm-lead" : currentIndex}
                                         initial={{ opacity: 0, x: direction === "right" ? 40 : -40 }}
                                         animate={{ opacity: 1, x: 0 }}
                                         exit={{ opacity: 0, x: direction === "right" ? -40 : 40 }}
@@ -269,7 +297,7 @@ const TestForm = () => {
                                             </>
                                         )}
 
-                                        {isLeadStep && (
+                                        {isLeadStep && !isConfirmingLead && (
                                             <div className="flex flex-col gap-4">
                                                 <div className="space-y-3 text-start">
                                                     <h1 className="text-4xl lg:text-5xl font-semibold" style={{ color: TEXT_DARK }}>
@@ -363,6 +391,41 @@ const TestForm = () => {
                                             </div>
                                         )}
 
+                                        {isConfirmingLead && (
+                                            <div className="flex flex-col gap-5 text-start">
+                                                <div className="space-y-3">
+                                                    <div className="w-11 h-11 rounded-full flex items-center justify-center" style={{ background: PINK_LIGHT, color: PINK }}>
+                                                        <Check size={22} />
+                                                    </div>
+                                                    <h1 className="text-3xl lg:text-4xl font-semibold" style={{ color: TEXT_DARK }}>
+                                                        Confermi i tuoi dati?
+                                                    </h1>
+                                                    <p className="leading-relaxed" style={{ color: TEXT_MID }}>
+                                                        Useremo questi dati per inviarti la routine personalizzata e i consigli richiesti.
+                                                    </p>
+                                                </div>
+
+                                                <div className="grid grid-cols-1 gap-3">
+                                                    <div className="rounded-2xl p-4" style={{ border: `1.5px solid ${PINK_MID}`, background: PINK_LIGHT }}>
+                                                        <p className="text-sm font-semibold uppercase" style={{ color: TEXT_SOFT }}>
+                                                            Nome
+                                                        </p>
+                                                        <p className="text-lg font-semibold break-words" style={{ color: TEXT_DARK }}>
+                                                            {form.watch("nome")}
+                                                        </p>
+                                                    </div>
+                                                    <div className="rounded-2xl p-4" style={{ border: `1.5px solid ${PINK_MID}`, background: PINK_LIGHT }}>
+                                                        <p className="text-sm font-semibold uppercase" style={{ color: TEXT_SOFT }}>
+                                                            Email
+                                                        </p>
+                                                        <p className="text-lg font-semibold break-words" style={{ color: TEXT_DARK }}>
+                                                            {form.watch("email")}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        )}
+
                                         {formMessage && (
                                             <p className="rounded-xl px-4 py-3 text-start" style={{ color: PINK, background: PINK_LIGHT }}>
                                                 {formMessage}
@@ -392,15 +455,26 @@ const TestForm = () => {
                                     <div className="flex justify-between gap-3">
                                         <button
                                             type="button"
-                                            onClick={prevQuestion}
-                                            disabled={isFirst}
+                                            onClick={isConfirmingLead ? editLeadData : prevQuestion}
+                                            disabled={isFirst && !isConfirmingLead}
                                             className="flex items-center gap-1.5 px-4 py-2 rounded-xl font-medium transition-all duration-150 disabled:opacity-30 cursor-pointer"
                                             style={{ border: `1.5px solid ${PINK_MID}`, color: TEXT_MID, background: "white" }}
                                         >
-                                            <ArrowLeft size={14} /> Indietro
+                                            {isConfirmingLead ? <Pencil size={14} /> : <ArrowLeft size={14} />}
+                                            {isConfirmingLead ? "Modifica dati" : "Indietro"}
                                         </button>
 
-                                        {!isLast ? (
+                                        {isConfirmingLead ? (
+                                            <button
+                                                type="button"
+                                                onClick={submitConfirmed}
+                                                className="flex items-center gap-1.5 px-5 py-2 rounded-xl font-semibold transition-all duration-150 cursor-pointer"
+                                                style={{ background: PINK, color: "white" }}
+                                            >
+                                                <Check size={16} />
+                                                Confermo
+                                            </button>
+                                        ) : !isLast ? (
                                             <button
                                                 type="button"
                                                 onClick={nextQuestion}
