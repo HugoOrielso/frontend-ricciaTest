@@ -51,6 +51,9 @@ const TestForm = () => {
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
     const [reply, setReply] = useState<string>("")
     const [prodottiTrovati, setProdottiTrovati] = useState<Prodotti[]>([])
+    const [consiglio, setConsiglio] = useState<string>()
+    const [consiglioStyling, setConsiglioStyling] = useState<string>()
+    const [consiglioLavaggio, setConsiglioLavaggio] = useState<string>()
     const [currentIndex, setCurrentIndex] = useState(0)
     const [direction, setDirection] = useState<"left" | "right">("right")
     const [formMessage, setFormMessage] = useState("")
@@ -159,7 +162,13 @@ const TestForm = () => {
         try {
             setIsSubmitting(true)
 
-            const { testo, prodotti } = generaRutina(values)
+            const {
+                testo,
+                prodotti,
+                consiglio: consiglioTrattamento,
+                consiglioStyling: notaStyling,
+                consiglioLavaggio: notaLavaggio,
+            } = generaRutina(values)
 
             const response = await fetch(API_URL, {
                 method: "POST",
@@ -172,6 +181,9 @@ const TestForm = () => {
                     newsletterConsent: values.newsletterConsent,
                     quizAnswers: buildQuizAnswers(values),
                     rutina: testo,
+                    ...(consiglioTrattamento && { consiglio: consiglioTrattamento }),
+                    ...(notaStyling && { consiglioStyling: notaStyling }),
+                    ...(notaLavaggio && { consiglioLavaggio: notaLavaggio }),
                     prodotti: prodotti.map(p => ({
                         nome: p.nome,
                         descrizione: p.descrizione,
@@ -189,6 +201,9 @@ const TestForm = () => {
 
             setReply(testo)
             setProdottiTrovati(prodotti)
+            setConsiglio(consiglioTrattamento)
+            setConsiglioStyling(notaStyling)
+            setConsiglioLavaggio(notaLavaggio)
         } catch (error) {
             setFormMessage(error instanceof Error ? error.message : "Si è verificato un errore. Riprova.")
         } finally {
@@ -515,7 +530,13 @@ const TestForm = () => {
                 )}
             </div>
             {reply.length > 0 && (
-                <Reply message={reply} prodotti={prodottiTrovati}  />
+                <Reply
+                    message={reply}
+                    prodotti={prodottiTrovati}
+                    consiglio={consiglio}
+                    consiglioStyling={consiglioStyling}
+                    consiglioLavaggio={consiglioLavaggio}
+                />
             )}
         </div>
     )

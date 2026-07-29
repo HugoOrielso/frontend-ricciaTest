@@ -6,9 +6,15 @@ import "../assets/embla.css"
 const Reply = ({
   message,
   prodotti,
+  consiglio,
+  consiglioStyling,
+  consiglioLavaggio,
 }: {
   message: string
   prodotti: Prodotti[]
+  consiglio?: string
+  consiglioStyling?: string
+  consiglioLavaggio?: string
 }) => {
   const OPTIONS: EmblaOptionsType = { loop: prodotti.length > 1 }
 
@@ -55,6 +61,28 @@ const Reply = ({
               ))}
             </ol>
 
+            {consiglioLavaggio && (
+              <div className="mt-5 rounded-2xl border border-sky-200 bg-sky-50/70 p-4">
+                <p className="mb-2 text-sm font-semibold uppercase tracking-wide text-sky-700">
+                  Consiglio di lavaggio
+                </p>
+                <p className="text-start leading-relaxed text-gray-700">
+                  {consiglioLavaggio}
+                </p>
+              </div>
+            )}
+
+            {consiglio && (
+              <div className="mt-5 rounded-2xl border border-[#E92176]/20 bg-pink-50/60 p-4">
+                <p className="mb-2 text-sm font-semibold uppercase tracking-wide text-[#E92176]">
+                  Il consiglio per i tuoi ricci
+                </p>
+                <p className="text-start leading-relaxed text-gray-700">
+                  {consiglio}
+                </p>
+              </div>
+            )}
+
             <button
               onClick={()=>{location.reload()}}
               className="mt-5 w-full sm:w-auto border border-[#E92176]/40 text-[#E92176] hover:bg-[#E92176] hover:text-white transition-colors duration-200 px-5 py-2.5 rounded-xl cursor-pointer font-medium"
@@ -70,6 +98,17 @@ const Reply = ({
               </p>
 
               <EmblaCarousel slides={prodotti} options={OPTIONS} />
+
+              {consiglioStyling && (
+                <div className="mt-4 w-full rounded-2xl border border-[#E92176]/20 bg-white p-4 shadow-sm">
+                  <p className="mb-2 text-sm font-semibold uppercase tracking-wide text-[#E92176]">
+                    Nota di styling
+                  </p>
+                  <p className="text-start text-sm leading-relaxed text-gray-700">
+                    {consiglioStyling}
+                  </p>
+                </div>
+              )}
             </div>
           )}
         </div>
