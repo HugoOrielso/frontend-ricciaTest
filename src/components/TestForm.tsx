@@ -5,7 +5,7 @@ import * as z from "zod"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { domandeCMR, type DomandaID } from "./data"
 import { motion, AnimatePresence } from "motion/react"
-import { ArrowLeft, ArrowRight, Check, Mail, Pencil } from "lucide-react"
+import { ArrowLeft, ArrowRight, Check, Mail, MailWarningIcon, Pencil } from "lucide-react"
 import Reply from "./Reply"
 import { generaRutina } from "@/Data/recomendazioni"
 
@@ -51,6 +51,7 @@ const TestForm = () => {
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
     const [reply, setReply] = useState<string>("")
     const [prodottiTrovati, setProdottiTrovati] = useState<Prodotti[]>([])
+    const [nomeRisultato, setNomeRisultato] = useState("")
     const [currentIndex, setCurrentIndex] = useState(0)
     const [direction, setDirection] = useState<"left" | "right">("right")
     const [formMessage, setFormMessage] = useState("")
@@ -198,6 +199,7 @@ const TestForm = () => {
 
             setReply(testo)
             setProdottiTrovati(prodotti)
+            setNomeRisultato(values.nome)
         } catch (error) {
             setFormMessage(error instanceof Error ? error.message : "Si è verificato un errore. Riprova.")
         } finally {
@@ -445,6 +447,12 @@ const TestForm = () => {
                                                             {form.watch("email")}
                                                         </p>
                                                     </div>
+                                                    <div className="flex items-center gap-2">
+                                                        <MailWarningIcon />
+                                                        <p>
+                                                            controlla che la tua e-mail sia corretta altrimenti non ti arriverà la routine
+                                                        </p>
+                                                    </div>
                                                 </div>
                                             </div>
                                         )}
@@ -525,7 +533,7 @@ const TestForm = () => {
             </div>
             {reply.length > 0 && (
                 <Reply
-                    message={reply}
+                    nome={nomeRisultato}
                     prodotti={prodottiTrovati}
                 />
             )}

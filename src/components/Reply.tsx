@@ -4,17 +4,13 @@ import "../assets/base.css"
 import "../assets/embla.css"
 
 const Reply = ({
-  message,
+  nome,
   prodotti,
 }: {
-  message: string
+  nome: string
   prodotti: Prodotti[]
 }) => {
   const OPTIONS: EmblaOptionsType = { loop: prodotti.length > 1 }
-
-  const righe = message.split("\n- ").filter(r => r.trim() !== "")
-  const titolo = righe[0]
-  const passi = righe.slice(1)
 
   return (
     <div className="w-full max-w-5xl mx-auto px-3 py-4 animate-fadeIn">
@@ -27,51 +23,48 @@ const Reply = ({
           </div>
         </div>
 
-        <div className="p-5 md:p-6 grid grid-cols-1 lg:grid-cols-[1.1fr_0.9fr] gap-6 items-start">
-          <div> 
-            <h3 className="text-2xl font-semibold text-gray-900 mb-4">
-              {titolo}
+        <div className="p-5 md:p-7">
+          <div className="mx-auto max-w-3xl text-center">
+            <h3 className="text-2xl md:text-3xl font-semibold text-gray-900">
+              {nome}, ecco la tua routine:
             </h3>
+            <p className="mt-3 leading-relaxed text-gray-700">
+              I prodotti da usare in base alle tue caratteristiche sono i seguenti:
+            </p>
+          </div>
 
-            <ol className="space-y-3">
-              {passi.map((step, i) => (
-                <li key={i} className="flex gap-3">
-                  <span className="mt-0.5 items-center flex-shrink-0 size-8 rounded-full bg-[#E92176]/10 text-[#E92176] text-sm font-bold flex  justify-center">
-                    {i + 1}
-                  </span>
-                  <p className="text-start text-gray-700 leading-relaxed">
-                    {(() => {
-                      const [label, ...rest] = step.trim().split(": ")
-                      return rest.length > 0 ? (
-                        <>
-                          <strong>{label}:</strong> {rest.join(": ")}
-                        </>
-                      ) : (
-                        step.trim()
-                      )
-                    })()}
-                  </p>
-                </li>
-              ))}
-            </ol>
+          {prodotti.length > 0 && (
+            <div className="mx-auto mt-6 max-w-3xl rounded-2xl border border-[#E92176]/15 bg-pink-50/60 p-4">
+              <EmblaCarousel slides={prodotti} options={OPTIONS} />
+            </div>
+          )}
 
+          <div className="mx-auto mt-6 max-w-3xl rounded-2xl border border-[#E92176]/20 bg-white p-5 text-center shadow-sm">
+            <p className="font-semibold leading-relaxed text-gray-900">
+              Controlla la tua posta: hai appena ricevuto i consigli per ottenere il massimo dai tuoi ricci.
+            </p>
+            <p className="mt-2 leading-relaxed text-gray-700">
+              Se non trovi l&apos;email, controlla anche nella cartella spam.
+            </p>
+            <p className="mt-2 leading-relaxed text-gray-700">
+              Altrimenti scrivici a{" "}
+              <a
+                href="mailto:info@laragazzariccia.com"
+                className="font-semibold text-[#E92176] underline underline-offset-2"
+              >
+                info@laragazzariccia.com
+              </a>
+            </p>
+          </div>
+
+          <div className="mt-6 text-center">
             <button
-              onClick={()=>{location.reload()}}
-              className="mt-5 w-full sm:w-auto border border-[#E92176]/40 text-[#E92176] hover:bg-[#E92176] hover:text-white transition-colors duration-200 px-5 py-2.5 rounded-xl cursor-pointer font-medium"
+              onClick={() => location.reload()}
+              className="w-full sm:w-auto border border-[#E92176]/40 text-[#E92176] hover:bg-[#E92176] hover:text-white transition-colors duration-200 px-5 py-2.5 rounded-xl cursor-pointer font-medium"
             >
               Rifai il test
             </button>
           </div>
-
-          {prodotti.length > 0 && (
-            <div className="bg-pink-50/60 border border-[#E92176]/15 rounded-2xl flex items-center flex-col p-4">
-              <p className="text-sm font-semibold text-[#E92176] uppercase tracking-wide mb-3 text-center">
-                Prodotti consigliati
-              </p>
-
-              <EmblaCarousel slides={prodotti} options={OPTIONS} />
-            </div>
-          )}
         </div>
       </div>
     </div>
