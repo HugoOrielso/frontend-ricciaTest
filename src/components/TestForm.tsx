@@ -51,9 +51,6 @@ const TestForm = () => {
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
     const [reply, setReply] = useState<string>("")
     const [prodottiTrovati, setProdottiTrovati] = useState<Prodotti[]>([])
-    const [consiglio, setConsiglio] = useState<string>()
-    const [consiglioStyling, setConsiglioStyling] = useState<string>()
-    const [consiglioLavaggio, setConsiglioLavaggio] = useState<string>()
     const [currentIndex, setCurrentIndex] = useState(0)
     const [direction, setDirection] = useState<"left" | "right">("right")
     const [formMessage, setFormMessage] = useState("")
@@ -201,9 +198,6 @@ const TestForm = () => {
 
             setReply(testo)
             setProdottiTrovati(prodotti)
-            setConsiglio(consiglioTrattamento)
-            setConsiglioStyling(notaStyling)
-            setConsiglioLavaggio(notaLavaggio)
         } catch (error) {
             setFormMessage(error instanceof Error ? error.message : "Si è verificato un errore. Riprova.")
         } finally {
@@ -533,9 +527,6 @@ const TestForm = () => {
                 <Reply
                     message={reply}
                     prodotti={prodottiTrovati}
-                    consiglio={consiglio}
-                    consiglioStyling={consiglioStyling}
-                    consiglioLavaggio={consiglioLavaggio}
                 />
             )}
         </div>
