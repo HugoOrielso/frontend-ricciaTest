@@ -20,7 +20,7 @@ const PRIVACY_URL = "https://laragazzariccia.com/pages/privacy-policy"
 const formSchema = z.object({
     guidaLavaggio: z.string({ required_error: "Seleziona una risposta" }).min(1, "Seleziona una risposta"),
     porosita: z.string({ required_error: "Seleziona una risposta" }).min(1, "Seleziona una risposta"),
-    sts: z.string({ required_error: "Seleziona una risposta" }).min(1, "Seleziona una risposta"),
+    sts: z.array(z.string()).min(1, "Seleziona almeno una risposta"),
     spessoreDensita: z.string({ required_error: "Seleziona una risposta" }).min(1, "Seleziona una risposta"),
     personalitaRicci: z.string({ required_error: "Seleziona una risposta" }).min(1, "Seleziona una risposta"),
     problemaPrincipale: z.string({ required_error: "Seleziona una risposta" }).min(1, "Seleziona una risposta"),
@@ -36,13 +36,16 @@ type FormValues = z.infer<typeof formSchema>
 const buildQuizAnswers = (values: FormValues) =>
     domandeCMR.map(domanda => {
         const value = values[domanda.id]
-        const selectedOption = domanda.opzioni.find(opzione => opzione.value === value)
+        const selectedValues = Array.isArray(value) ? value : [value]
+        const labels = domanda.opzioni
+            .filter(opzione => selectedValues.includes(opzione.value))
+            .map(opzione => opzione.label)
 
         return {
             id: domanda.id,
             question: domanda.titolo,
             value,
-            label: selectedOption?.label ?? value,
+            label: labels.join(", "),
         }
     })
 
@@ -70,7 +73,7 @@ const TestForm = () => {
         defaultValues: {
             guidaLavaggio: "",
             porosita: "",
-            sts: "",
+            sts: [],
             spessoreDensita: "",
             personalitaRicci: "",
             problemaPrincipale: "",
@@ -280,39 +283,84 @@ const TestForm = () => {
                                                     )}
                                                 </div>
 
-                                                <RadioGroup
-                                                    value={form.watch(domandaId)}
-                                                    onValueChange={(v) => {
-                                                        form.setValue(domandaId, v, { shouldValidate: true })
-                                                        setFormMessage("")
-                                                    }}
-                                                    className="flex flex-col gap-2"
-                                                >
-                                                    {domanda.opzioni.map((opzione) => {
-                                                        const checked = form.watch(domandaId) === opzione.value
-                                                        return (
-                                                            <label
-                                                                key={opzione.id}
-                                                                htmlFor={opzione.id}
-                                                                className="flex items-center gap-3 rounded-xl p-5 cursor-pointer transition-all duration-150"
-                                                                style={{
-                                                                    border: `1.5px solid ${checked ? PINK : PINK_MID}`,
-                                                                    background: checked ? PINK_LIGHT : "white",
-                                                                }}
-                                                            >
-                                                                <RadioGroupItem
-                                                                    value={opzione.value}
-                                                                    id={opzione.id}
-                                                                    className="shrink-0 size-6"
-                                                                    style={{ accentColor: PINK, color: PINK, borderColor: PINK } as React.CSSProperties}
-                                                                />
-                                                                <span className="text-start leading-snug" style={{ color: checked ? TEXT_DARK : TEXT_MID }}>
-                                                                    {opzione.label}
-                                                                </span>
-                                                            </label>
-                                                        )
-                                                    })}
-                                                </RadioGroup>
+                                                {domandaId === "sts" ? (
+                                                    <div className="flex flex-col gap-2" role="group">
+                                                        {domanda.opzioni.map(opzione => {
+                                                            const selectedValues = form.watch("sts")
+                                                            const checked = selectedValues.includes(opzione.value)
+
+                                                            return (
+                                                                <label
+                                                                    key={opzione.id}
+                                                                    htmlFor={opzione.id}
+                                                                    className="flex items-center gap-3 rounded-xl p-5 cursor-pointer transition-all duration-150"
+                                                                    style={{
+                                                                        border: `1.5px solid ${checked ? PINK : PINK_MID}`,
+                                                                        background: checked ? PINK_LIGHT : "white",
+                                                                    }}
+                                                                >
+                                                                    <input
+                                                                        id={opzione.id}
+                                                                        type="checkbox"
+                                                                        checked={checked}
+                                                                        onChange={() => {
+                                                                            const nextValues = opzione.value === "nessuna"
+                                                                                ? (checked ? [] : ["nessuna"])
+                                                                                : checked
+                                                                                    ? selectedValues.filter(value => value !== opzione.value)
+                                                                                    : [
+                                                                                        ...selectedValues.filter(value => value !== "nessuna"),
+                                                                                        opzione.value,
+                                                                                    ]
+
+                                                                            form.setValue("sts", nextValues, { shouldValidate: true })
+                                                                            setFormMessage("")
+                                                                        }}
+                                                                        className="size-5 shrink-0"
+                                                                        style={{ accentColor: PINK }}
+                                                                    />
+                                                                    <span className="text-start leading-snug" style={{ color: checked ? TEXT_DARK : TEXT_MID }}>
+                                                                        {opzione.label}
+                                                                    </span>
+                                                                </label>
+                                                            )
+                                                        })}
+                                                    </div>
+                                                ) : (
+                                                    <RadioGroup
+                                                        value={form.watch(domandaId)}
+                                                        onValueChange={(v) => {
+                                                            form.setValue(domandaId, v, { shouldValidate: true })
+                                                            setFormMessage("")
+                                                        }}
+                                                        className="flex flex-col gap-2"
+                                                    >
+                                                        {domanda.opzioni.map((opzione) => {
+                                                            const checked = form.watch(domandaId) === opzione.value
+                                                            return (
+                                                                <label
+                                                                    key={opzione.id}
+                                                                    htmlFor={opzione.id}
+                                                                    className="flex items-center gap-3 rounded-xl p-5 cursor-pointer transition-all duration-150"
+                                                                    style={{
+                                                                        border: `1.5px solid ${checked ? PINK : PINK_MID}`,
+                                                                        background: checked ? PINK_LIGHT : "white",
+                                                                    }}
+                                                                >
+                                                                    <RadioGroupItem
+                                                                        value={opzione.value}
+                                                                        id={opzione.id}
+                                                                        className="shrink-0 size-6"
+                                                                        style={{ accentColor: PINK, color: PINK, borderColor: PINK } as React.CSSProperties}
+                                                                    />
+                                                                    <span className="text-start leading-snug" style={{ color: checked ? TEXT_DARK : TEXT_MID }}>
+                                                                        {opzione.label}
+                                                                    </span>
+                                                                </label>
+                                                            )
+                                                        })}
+                                                    </RadioGroup>
+                                                )}
 
                                                 {form.formState.errors[domandaId] && (
                                                     <p style={{ color: PINK }}>

@@ -3,7 +3,7 @@ import { prodottiDisponibili } from "@/Data/Prodotti"
 type FormValues = {
   guidaLavaggio: string
   porosita: string
-  sts: string
+  sts: string[]
   spessoreDensita: string
   personalitaRicci: string
   problemaPrincipale: string
@@ -66,10 +66,10 @@ function getTrattamento(values: FormValues): string {
     values.spessoreDensita === "grossi-voluminosi" ||
     values.spessoreDensita === "tantissimi-difficili"
 
-  const stsChimico = values.sts === "colore-decolorazione-stiraggio"
-  const stsFarmaci = values.sts === "terapie-farmaci"
-  const stsMeccanico = values.sts === "cuffie-casco-legati"
-  const stsNessuno = values.sts === "nessuna"
+  const stsChimico = values.sts.includes("colore-decolorazione-stiraggio")
+  const stsFarmaci = values.sts.includes("terapie-farmaci")
+  const stsMeccanico = values.sts.includes("cuffie-casco-legati")
+  const stsNessuno = values.sts.includes("nessuna")
 
   const lavaggioDistante =
     values.guidaLavaggio === "dopo-4-5-giorni" ||
@@ -107,29 +107,29 @@ function getTrattamento(values: FormValues): string {
 function getConsiglioTrattamento(values: FormValues): string | undefined {
   const { spessoreDensita, sts } = values
 
-  if (spessoreDensita === "tantissimi-difficili" && sts === "nessuna") {
+  if (spessoreDensita === "tantissimi-difficili" && sts.includes("nessuna")) {
     return "Quando i ricci tendono a essere più ruvidi, rigidi o fanno fatica a trattenere l'idratazione, hanno bisogno di costanza più che di grandi quantità di prodotto. Alterna un impacco pre-shampoo con balsamo e qualche goccia di olio: aiuterai i capelli a ritrovare morbidezza, elasticità e saranno molto più facili da gestire."
   }
 
   if (
     spessoreDensita === "medi-normali" &&
-    sts === "colore-decolorazione-stiraggio"
+    sts.includes("colore-decolorazione-stiraggio")
   ) {
     return "L’equilibrio dei tuoi ricci devi cercare di mantenerlo nel tempo. Un trattamento proteico periodico aiuta a rinforzare la fibra del capello, mantenendo i ricci elastici, definiti e pronti a sostenere meglio lo styling."
   }
 
-  if (spessoreDensita === "grossi-voluminosi" && sts === "nessuna") {
+  if (spessoreDensita === "grossi-voluminosi" && sts.includes("nessuna")) {
     return "Quando i ricci tendono a essere più corposi, hanno bisogno di mantenere il giusto equilibrio tra forza e idratazione. Ti consiglio di alternare un impacco pre-shampoo con balsamo e qualche goccia di olio, in questo modo i ricci rimarranno più morbidi, elastici e luminosi, senza perdere definizione."
   }
 
   if (
     spessoreDensita === "fini-pochi" &&
-    sts === "colore-decolorazione-stiraggio"
+    sts.includes("colore-decolorazione-stiraggio")
   ) {
     return "I tuoi ricci hanno bisogno di più struttura per mantenere volume e definizione nel tempo. Per questo ti consiglio un trattamento proteico: aiuta a rinforzare il capello senza appesantirlo, così lo styling dura più a lungo e i ricci risultano più corposi e resistenti."
   }
 
-  if (spessoreDensita === "fini-tanti" && sts === "nessuna") {
+  if (spessoreDensita === "fini-tanti" && sts.includes("nessuna")) {
     return "Anche quando i capelli sono numerosi, se la fibra è sottile può perdere facilmente sostegno. Un trattamento proteico aiuta a rinforzare la struttura del capello, migliorando la tenuta dello styling e lasciando i ricci più definiti e voluminosi."
   }
 
