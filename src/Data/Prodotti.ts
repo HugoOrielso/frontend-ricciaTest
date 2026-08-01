@@ -36,6 +36,12 @@ export const prodottiDisponibili = [
     link: "https://laragazzariccia.com/products/trattamento-intensivo-alle-proteine",
   },
   {
+    nome: "Trattamento Riparazione Lipidica",
+    descrizione: "Olio nutriente per ricci spenti o difficili da gestire. Aiuta a migliorare morbidezza, elasticità e lucentezza e può essere aggiunto al balsamo per un impacco pre-shampoo.",
+    immagine: "https://laragazzariccia.com/cdn/shop/files/KitNutrire_1_1080x1080.png",
+    link: "https://laragazzariccia.com/products/olio-nutriente",
+  },
+  {
     nome: "Kit Trattamenti",
     descrizione: "Un trio di trattamenti bilanciati per intervenire su forza, nutrimento e idratazione.",
     immagine: "https://laragazzariccia.com/cdn/shop/files/Kit_trattamenti_1080x1080.png",

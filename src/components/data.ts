@@ -27,6 +27,7 @@ export const domandeCMR = [
     descrizione: "",
     opzioni: [
       { id: "colore-decolorazione-stiraggio", value: "colore-decolorazione-stiraggio", label: "Colore, decolorazione o stiraggio" },
+      { id: "caduta-stress-ormoni", value: "caduta-stress-ormoni", label: "Caduta, stress o cambiamenti ormonali" },
       { id: "terapie-farmaci", value: "terapie-farmaci", label: "Terapie/farmaci importanti" },
       { id: "cuffie-casco-legati", value: "cuffie-casco-legati", label: "Uso spesso cuffie/casco/capelli legati" },
       { id: "nessuna", value: "nessuna", label: "Nessuna di queste" },

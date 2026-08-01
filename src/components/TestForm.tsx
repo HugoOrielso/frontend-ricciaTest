@@ -169,6 +169,7 @@ const TestForm = () => {
                 consiglio: consiglioTrattamento,
                 consiglioStyling: notaStyling,
                 consiglioLavaggio: notaLavaggio,
+                consiglioSTS,
             } = generaRutina(values)
 
             const response = await fetch(API_URL, {
@@ -185,6 +186,7 @@ const TestForm = () => {
                     ...(consiglioTrattamento && { consiglio: consiglioTrattamento }),
                     ...(notaStyling && { consiglioStyling: notaStyling }),
                     ...(notaLavaggio && { consiglioLavaggio: notaLavaggio }),
+                    ...(consiglioSTS && { consiglioSTS }),
                     prodotti: prodotti.map(p => ({
                         nome: p.nome,
                         descrizione: p.descrizione,
@@ -260,7 +262,7 @@ const TestForm = () => {
                                 </div>
                             </div>
 
-                            <div className="px-6 pt-4 pb-2 min-h-[280px]">
+                            <div className="px-6 pt-4 pb-2 min-h-70">
                                 <AnimatePresence mode="wait">
                                     <motion.div
                                         key={isConfirmingLead ? "confirm-lead" : currentIndex}

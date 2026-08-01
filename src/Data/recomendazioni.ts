@@ -75,6 +75,27 @@ function getTrattamento(values: FormValues): string {
     values.guidaLavaggio === "dopo-4-5-giorni" ||
     values.guidaLavaggio === "una-settimana"
 
+  // Regole specifiche definite dalla combinazione Spessore + STS.
+  if (values.spessoreDensita === "tantissimi-difficili" && stsNessuno) {
+    return "Trattamento Riparazione Lipidica"
+  }
+
+  if (values.spessoreDensita === "medi-normali" && stsChimico) {
+    return "Riparazione Proteica"
+  }
+
+  if (values.spessoreDensita === "grossi-voluminosi" && stsNessuno) {
+    return "Trattamento Riparazione Lipidica"
+  }
+
+  if (values.spessoreDensita === "fini-pochi" && stsChimico) {
+    return "Riparazione Proteica"
+  }
+
+  if (values.spessoreDensita === "fini-tanti" && stsNessuno) {
+    return "Riparazione Proteica"
+  }
+
   if (capelliFini) {
     return "Riparazione Proteica"
   }
@@ -106,7 +127,7 @@ function getTrattamento(values: FormValues): string {
 
 function getConsiglioTrattamento(values: FormValues): string | undefined {
   const { spessoreDensita, sts } = values
-
+  console.log("getConsiglioTrattamento", spessoreDensita, sts)
   if (spessoreDensita === "tantissimi-difficili" && sts.includes("nessuna")) {
     return "Quando i ricci tendono a essere più ruvidi, rigidi o fanno fatica a trattenere l'idratazione, hanno bisogno di costanza più che di grandi quantità di prodotto. Alterna un impacco pre-shampoo con balsamo e qualche goccia di olio: aiuterai i capelli a ritrovare morbidezza, elasticità e saranno molto più facili da gestire."
   }
@@ -134,6 +155,29 @@ function getConsiglioTrattamento(values: FormValues): string | undefined {
   }
 
   return undefined
+}
+
+function getConsiglioSTS(values: FormValues): string | undefined {
+  const consigli: Record<string, string> = {
+    "colore-decolorazione-stiraggio":
+      "Se hai colorato o decolorato i capelli, è normale che in questo periodo i tuoi ricci si comportino in modo diverso. Non significa che resteranno così per sempre. Adatta la routine a quello che stanno vivendo oggi e inizia dalla routine che ti ho appena consigliato.",
+    "caduta-stress-ormoni":
+      "Lo stress, gli ormoni o un periodo particolare della vita possono cambiare temporaneamente anche i tuoi ricci. Non cercare di combatterli: ascoltali. In questo momento hanno bisogno di attenzioni diverse, così come te, e va bene così. Quando questa fase passerà, cambieranno ancora, ma tu saprai come gestirli seguendo la routine che ti ho appena consigliato.",
+    "terapie-farmaci":
+      "Alcune terapie possono rendere i capelli diversi da come li hai sempre conosciuti. Se oggi sono più secchi, fragili o meno definiti non significa che hai sbagliato qualcosa. Semplicemente i tuoi ricci ti stanno chiedendo cure diverse. Tu continua ad ascoltarli, senza pretendere la perfezione, e segui la routine che ti ho appena consigliato.",
+    "cuffie-casco-legati":
+      "Se usi spesso casco, cuffie o tieni i capelli legati, è normale che lo styling duri meno o che i ricci si schiaccino più facilmente. Non viverlo come un problema: basta qualche accorgimento nella routine e torneranno a prendere forma molto più facilmente, per esempio rinfrescandoli con una mousse. Per mantenerli sani, segui la routine che ti ho appena consigliato.",
+    nessuna:
+      "In questo momento i tuoi ricci non stanno affrontando cambiamenti particolari, ed è un ottimo punto di partenza. Continua a prendertene cura con costanza seguendo la routine che ti ho appena consigliato, ma senza l'ansia di dover fare tutto alla perfezione. Anche una routine semplice, se fatta con continuità, può fare una grande differenza.",
+  }
+
+  const selezionati = values.sts
+    .map(value => consigli[value])
+    .filter((consiglio): consiglio is string => Boolean(consiglio))
+
+  return selezionati.length
+    ? selezionati.map((consiglio, index) => `${index + 1}. ${consiglio}`).join("\n\n")
+    : undefined
 }
 
 function getConsiglioStyling(values: FormValues): string | undefined {
@@ -213,6 +257,7 @@ export function generaRutina(values: FormValues): {
   consiglio?: string
   consiglioStyling?: string
   consiglioLavaggio?: string
+  consiglioSTS?: string
 } {
   const prodotti: Prodotto[] = []
 
@@ -222,6 +267,7 @@ export function generaRutina(values: FormValues): {
   const consiglio = getConsiglioTrattamento(values)
   const consiglioStyling = getConsiglioStyling(values)
   const consiglioLavaggio = getConsiglioLavaggio(values)
+  const consiglioSTS = getConsiglioSTS(values)
 
   addUnique(prodotti, lavaggio.prodotto, styling, trattamento)
 
@@ -240,5 +286,6 @@ export function generaRutina(values: FormValues): {
     consiglio,
     consiglioStyling,
     consiglioLavaggio,
+    consiglioSTS,
   }
 }
