@@ -5,7 +5,13 @@ import * as z from "zod"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { domandeCMR, type DomandaID } from "./data"
 import { motion, AnimatePresence } from "motion/react"
-import { ArrowLeft, ArrowRight, Check, Mail, MailWarningIcon, Pencil } from "lucide-react"
+import {
+    ArrowLeft, ArrowRight, Check, Mail, MailWarningIcon, Pencil,
+    Droplet, Droplets, CalendarDays, Sparkles, Waves, FlaskConical,
+    Paintbrush, Activity, Pill, HardHat, CircleOff, Feather, Layers3,
+    CircleGauge, Cloud, Wind, Sun, Volume2, Heart, ShieldCheck, HelpCircle,
+    type LucideIcon,
+} from "lucide-react"
 import Reply from "./Reply"
 import { generaRutina } from "@/Data/recomendazioni"
 
@@ -16,6 +22,40 @@ const TEXT_DARK = "#4B1528"
 const TEXT_MID = "#72243E"
 const TEXT_SOFT = "#993556"
 const PRIVACY_URL = "https://laragazzariccia.com/pages/privacy-policy"
+
+const OPTION_ICONS: Record<Exclude<DomandaID, "personalitaRicci">, LucideIcon[]> = {
+    guidaLavaggio: [Droplet, Droplets, Waves, CalendarDays],
+    porosita: [FlaskConical, Droplets, Layers3, Sparkles],
+    sts: [Paintbrush, Activity, Pill, HardHat, CircleOff],
+    spessoreDensita: [Feather, Wind, CircleGauge, Volume2, Layers3],
+    problemaPrincipale: [Cloud, Volume2, Sun, Waves, CalendarDays, Droplet, HelpCircle],
+    obiettivoDesiderato: [Sparkles, Volume2, Heart, Feather, CircleGauge, ShieldCheck],
+}
+
+const cleanQuestionTitle = (title: string) => title.replace(/^\d+\.\s*/, "")
+
+const CURL_IMAGES: Record<string, string[]> = {
+    "onde-morbide": [
+        "/images/kindAir/Onde%20morbide%201.webp",
+        "/images/kindAir/Onde%20morbide%202.webp",
+    ],
+    "ricci-definiti": [
+        "/images/kindAir/Ricci%20a%20S%201.webp",
+        "/images/kindAir/Ricci%20a%20S%202.webp",
+    ],
+    "ricci-ribelli": [
+        "/images/kindAir/Ricci%20irregolari%20e%20ribelli.webp",
+    ],
+    "ricci-stretti-afro": [
+        "/images/kindAir/Ricci%20stretti%20o%20afro%201.webp",
+    ],
+    "mix-tutto": [
+        "/images/kindAir/Onde%20morbide%201.webp",
+        "/images/kindAir/Ricci%20a%20S%202.webp",
+        "/images/kindAir/Ricci%20irregolari%20e%20ribelli.webp",
+        "/images/kindAir/Ricci%20stretti%20o%20afro%201.webp",
+    ],
+}
 
 const formSchema = z.object({
     guidaLavaggio: z.string({ required_error: "Seleziona una risposta" }).min(1, "Seleziona una risposta"),
@@ -63,10 +103,9 @@ const TestForm = () => {
     const isLeadStep = currentIndex === domandeCMR.length
     const domanda = isLeadStep ? null : domandeCMR[currentIndex]
     const domandaId = domanda?.id as DomandaID | undefined
-    const totalSteps = domandeCMR.length + 1
+    const questionCount = domandeCMR.length
     const isFirst = currentIndex === 0
     const isLast = isLeadStep || isConfirmingLead
-    const progress = ((currentIndex + 1) / totalSteps) * 100
 
     const form = useForm<FormValues>({
         resolver: zodResolver(formSchema),
@@ -83,6 +122,14 @@ const TestForm = () => {
             newsletterConsent: false,
         },
     })
+
+    useEffect(() => {
+        const curlImageUrls = [...new Set(Object.values(CURL_IMAGES).flat())]
+        curlImageUrls.forEach(src => {
+            const image = new Image()
+            image.src = src
+        })
+    }, [])
 
     useEffect(() => {
         const sendHeight = () => {
@@ -243,21 +290,14 @@ const TestForm = () => {
                                 </p>
                             </div>
 
-                            <div className="h-1 w-full" style={{ background: PINK_LIGHT }}>
-                                <div
-                                    className="h-1 transition-all duration-500"
-                                    style={{ width: `${progress}%`, background: PINK }}
-                                />
-                            </div>
-
-                            <div className="flex justify-between items-center px-6 pt-4">
-                                <span className="font-medium" style={{ color: TEXT_SOFT }}>
+                            <div className="flex flex-col gap-3 px-6 pt-5">
+                                <span className="text-start text-xs font-semibold uppercase tracking-wide" style={{ color: TEXT_SOFT }}>
                                     {isConfirmingLead ? "Conferma dati" : isLeadStep ? "Invio risultato" : `Domanda ${currentIndex + 1} di ${domandeCMR.length}`}
                                 </span>
-                                <div className="flex gap-1">
-                                    {Array.from({ length: totalSteps }).map((_, i) => (
-                                        <div key={i} className="w-1.5 h-1.5 rounded-full transition-all duration-300"
-                                            style={{ background: i <= currentIndex ? PINK : PINK_MID }} />
+                                <div className="grid w-full gap-1.5" style={{ gridTemplateColumns: `repeat(${questionCount}, minmax(0, 1fr))` }} aria-label={`Progresso: ${Math.min(currentIndex + 1, questionCount)} di ${questionCount}`}>
+                                    {Array.from({ length: questionCount }).map((_, i) => (
+                                        <div key={i} className="h-1 rounded-full transition-all duration-500"
+                                            style={{ background: i <= Math.min(currentIndex, questionCount - 1) ? PINK : PINK_LIGHT }} />
                                     ))}
                                 </div>
                             </div>
@@ -275,8 +315,8 @@ const TestForm = () => {
                                         {!isLeadStep && domanda && domandaId && (
                                             <>
                                                 <div>
-                                                    <h2 className="text-start font-semibold mb-1" style={{ color: TEXT_DARK }}>
-                                                        {domanda.titolo}
+                                                    <h2 className="text-center text-xl font-semibold mb-1" style={{ color: TEXT_DARK }}>
+                                                        {domandaId === "personalitaRicci" ? domanda.titolo : cleanQuestionTitle(domanda.titolo)}
                                                     </h2>
                                                     {domanda.descrizione && (
                                                         <p className="text-start leading-relaxed" style={{ color: TEXT_MID }}>
@@ -286,16 +326,17 @@ const TestForm = () => {
                                                 </div>
 
                                                 {domandaId === "sts" ? (
-                                                    <div className="flex flex-col gap-2" role="group">
-                                                        {domanda.opzioni.map(opzione => {
+                                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3" role="group">
+                                                        {domanda.opzioni.map((opzione, optionIndex) => {
                                                             const selectedValues = form.watch("sts")
                                                             const checked = selectedValues.includes(opzione.value)
+                                                            const Icon = OPTION_ICONS.sts[optionIndex]
 
                                                             return (
                                                                 <label
                                                                     key={opzione.id}
                                                                     htmlFor={opzione.id}
-                                                                    className="flex items-center gap-3 rounded-xl p-5 cursor-pointer transition-all duration-150"
+                                                                    className="relative flex min-h-36 flex-col items-center justify-center gap-3 rounded-xl p-5 cursor-pointer text-center transition-all duration-150 hover:-translate-y-0.5 hover:shadow-md"
                                                                     style={{
                                                                         border: `1.5px solid ${checked ? PINK : PINK_MID}`,
                                                                         background: checked ? PINK_LIGHT : "white",
@@ -318,16 +359,68 @@ const TestForm = () => {
                                                                             form.setValue("sts", nextValues, { shouldValidate: true })
                                                                             setFormMessage("")
                                                                         }}
-                                                                        className="size-5 shrink-0"
+                                                                        className="absolute right-3 top-3 size-4 shrink-0"
                                                                         style={{ accentColor: PINK }}
                                                                     />
-                                                                    <span className="text-start leading-snug" style={{ color: checked ? TEXT_DARK : TEXT_MID }}>
+                                                                    <span className="flex size-12 items-center justify-center rounded-full" style={{ background: PINK_LIGHT, color: TEXT_SOFT }}>
+                                                                        <Icon size={22} strokeWidth={1.9} />
+                                                                    </span>
+                                                                    <span className="max-w-112 text-sm sm:text-base leading-snug font-semibold" style={{ color: checked ? TEXT_DARK : TEXT_MID }}>
                                                                         {opzione.label}
                                                                     </span>
                                                                 </label>
                                                             )
                                                         })}
                                                     </div>
+                                                ) : domandaId === "personalitaRicci" ? (
+                                                    <RadioGroup
+                                                        value={form.watch(domandaId)}
+                                                        onValueChange={(v) => {
+                                                            form.setValue(domandaId, v, { shouldValidate: true })
+                                                            setFormMessage("")
+                                                        }}
+                                                        className="grid grid-cols-1 sm:grid-cols-2 gap-3"
+                                                    >
+                                                        {domanda.opzioni.map((opzione) => {
+                                                            const checked = form.watch(domandaId) === opzione.value
+                                                            const images = CURL_IMAGES[opzione.value] ?? []
+                                                            return (
+                                                                <label
+                                                                    key={opzione.id}
+                                                                    htmlFor={opzione.id}
+                                                                    className="group relative flex cursor-pointer flex-col overflow-hidden rounded-2xl text-center transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg"
+                                                                    style={{
+                                                                        border: `1.5px solid ${checked ? PINK : PINK_MID}`,
+                                                                        background: checked ? "#fff8fb" : "white",
+                                                                        boxShadow: checked ? "0 12px 28px rgba(233, 33, 118, 0.14)" : "0 5px 16px rgba(75, 21, 40, 0.06)",
+                                                                    }}
+                                                                >
+                                                                    <span
+                                                                        className={`grid h-48 w-full overflow-hidden bg-pink-50 ${images.length > 2 ? "grid-cols-2 grid-rows-2" : images.length === 2 ? "grid-cols-2" : "grid-cols-1"}`}
+                                                                    >
+                                                                        {images.map((image, imageIndex) => (
+                                                                            <img
+                                                                                key={image}
+                                                                                src={image}
+                                                                                alt={`${opzione.label}, esempio ${imageIndex + 1}`}
+                                                                                loading="lazy"
+                                                                                className="h-full min-h-0 w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+                                                                            />
+                                                                        ))}
+                                                                    </span>
+                                                                    <RadioGroupItem
+                                                                        value={opzione.value}
+                                                                        id={opzione.id}
+                                                                        className="absolute right-3 top-3 z-10 size-6 bg-white shadow-sm"
+                                                                        style={{ color: PINK, borderColor: checked ? PINK : "white" } as React.CSSProperties}
+                                                                    />
+                                                                    <span className="px-4 py-4 leading-snug font-semibold" style={{ color: checked ? TEXT_DARK : TEXT_MID }}>
+                                                                        {opzione.label}
+                                                                    </span>
+                                                                </label>
+                                                            )
+                                                        })}
+                                                    </RadioGroup>
                                                 ) : (
                                                     <RadioGroup
                                                         value={form.watch(domandaId)}
@@ -335,27 +428,32 @@ const TestForm = () => {
                                                             form.setValue(domandaId, v, { shouldValidate: true })
                                                             setFormMessage("")
                                                         }}
-                                                        className="flex flex-col gap-2"
+                                                        className="grid grid-cols-1 sm:grid-cols-2 gap-3"
                                                     >
-                                                        {domanda.opzioni.map((opzione) => {
+                                                        {domanda.opzioni.map((opzione, optionIndex) => {
                                                             const checked = form.watch(domandaId) === opzione.value
+                                                            const Icon = OPTION_ICONS[domandaId as Exclude<DomandaID, "personalitaRicci">][optionIndex]
                                                             return (
                                                                 <label
                                                                     key={opzione.id}
                                                                     htmlFor={opzione.id}
-                                                                    className="flex items-center gap-3 rounded-xl p-5 cursor-pointer transition-all duration-150"
+                                                                    className="relative flex min-h-36 flex-col items-center justify-center gap-3 rounded-xl p-5 cursor-pointer text-center transition-all duration-150 hover:-translate-y-0.5 hover:shadow-md"
                                                                     style={{
                                                                         border: `1.5px solid ${checked ? PINK : PINK_MID}`,
-                                                                        background: checked ? PINK_LIGHT : "white",
+                                                                        background: checked ? "#fff8fb" : "white",
+                                                                        boxShadow: checked ? "0 10px 24px rgba(233, 33, 118, 0.10)" : undefined,
                                                                     }}
                                                                 >
                                                                     <RadioGroupItem
                                                                         value={opzione.value}
                                                                         id={opzione.id}
-                                                                        className="shrink-0 size-6"
-                                                                        style={{ accentColor: PINK, color: PINK, borderColor: PINK } as React.CSSProperties}
+                                                                        className="absolute right-3 top-3 size-4"
+                                                                        style={{ color: PINK, borderColor: checked ? PINK : PINK_MID } as React.CSSProperties}
                                                                     />
-                                                                    <span className="text-start leading-snug" style={{ color: checked ? TEXT_DARK : TEXT_MID }}>
+                                                                    <span className="flex size-12 items-center justify-center rounded-full" style={{ background: PINK_LIGHT, color: TEXT_SOFT }}>
+                                                                        <Icon size={22} strokeWidth={1.9} />
+                                                                    </span>
+                                                                    <span className="max-w-112 text-sm sm:text-base leading-snug font-semibold" style={{ color: checked ? TEXT_DARK : TEXT_MID }}>
                                                                         {opzione.label}
                                                                     </span>
                                                                 </label>
