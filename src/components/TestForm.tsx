@@ -266,7 +266,7 @@ const TestForm = () => {
     }
 
     return (
-        <div className="min-h-screen w-full flex items-start justify-center">
+        <div className="min-h-screen w-full flex items-center justify-center">
             <div className="flex flex-col gap-2">
                 {reply.length === 0 && (
                     <form
