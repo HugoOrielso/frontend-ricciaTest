@@ -20,7 +20,7 @@ export const prodottiDisponibili = [
   {
     nome: "Kit Volume WOW",
     descrizione: "Kit composto da Leave-in Riccia e Gel lunga tenuta, ideale per dare il giusto volume ai tuoi ricci.",
-    immagine: "https://laragazzariccia.com/cdn/shop/files/Kit_volume_1_1080x1080.webp",
+    immagine: "https://laragazzariccia.com/cdn/shop/files/Kit_styling_la_ragazza_riccia_1080x1080.jpg?v=1785493264",
     link: "https://laragazzariccia.com/products/kit-volume",
   },
   {

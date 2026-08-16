@@ -1,13 +1,39 @@
-import { Check, Gift, MailCheck, RotateCcw, Sparkles } from "lucide-react"
+import { Gift, MailCheck, RotateCcw, Sparkles } from "lucide-react"
+import { useEffect, useState } from "react"
 
 const Reply = ({
   nome,
   prodotti,
+  coupon,
 }: {
   nome: string
   prodotti: Prodotti[]
+  coupon: { code: string; percent: number; expiresAt: string } | null
 }) => {
   const prodottoPrincipale = prodotti[0]
+  const [remainingMs, setRemainingMs] = useState(() =>
+    coupon ? Math.max(0, new Date(coupon.expiresAt).getTime() - Date.now()) : 0
+  )
+
+  useEffect(() => {
+    if (!coupon) return
+
+    const updateCountdown = () => {
+      setRemainingMs(Math.max(0, new Date(coupon.expiresAt).getTime() - Date.now()))
+    }
+
+    updateCountdown()
+    const intervalId = window.setInterval(updateCountdown, 1000)
+    return () => window.clearInterval(intervalId)
+  }, [coupon])
+
+  const totalSeconds = Math.floor(remainingMs / 1000)
+  const countdown = {
+    hours: Math.floor(totalSeconds / 3600),
+    minutes: Math.floor((totalSeconds % 3600) / 60),
+    seconds: totalSeconds % 60,
+  }
+  const couponExpired = remainingMs <= 0
 
   return (
     <div className="w-full max-w-5xl mx-auto px-3 py-5 animate-fadeIn">
@@ -25,70 +51,84 @@ const Reply = ({
             </p>
           </header>
 
-          {prodottoPrincipale && (
-            <div className="mx-auto mt-7 max-w-3xl overflow-hidden rounded-2xl border border-[#f4c0d1] bg-white">
-              <div className="flex flex-col items-center gap-5 p-5 text-center sm:flex-row sm:p-6 sm:text-left">
-                <div className="flex size-28 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-[#fff7fa] sm:size-32">
-                  <img
-                    src={prodottoPrincipale.immagine}
-                    alt={prodottoPrincipale.nome}
-                    className="h-full w-full object-contain p-2"
-                    loading="eager"
-                  />
-                </div>
-
-                <div className="min-w-0 flex-1">
-                  <p className="text-xs font-semibold uppercase tracking-wide text-[#E92176]">
-                    Kit consigliato
-                  </p>
-                  <h2 className="mt-1 text-lg font-semibold text-[#4B1528] sm:text-xl">
-                    {prodottoPrincipale.nome}
-                  </h2>
-                  <p className="mt-2 text-sm leading-relaxed text-[#72243E]">
-                    {prodottoPrincipale.descrizione}
-                  </p>
-                  <a
-                    href={prodottoPrincipale.link}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="mt-3 inline-flex items-center gap-1 font-semibold text-[#E92176] hover:underline"
+          {prodotti.length > 0 && (
+            <div className="mx-auto mt-7 max-w-4xl">
+              <p className="mb-4 text-center text-xs font-semibold uppercase tracking-wide text-[#E92176]">
+                I 3 kit consigliati per la tua routine
+              </p>
+              <div className="flex flex-col gap-4">
+                {prodotti.map((prodotto, index) => (
+                  <article
+                    key={`${prodotto.nome}-${index}`}
+                    className="flex flex-col items-center gap-5 overflow-hidden rounded-2xl border border-[#f4c0d1] bg-white p-5 text-center shadow-[0_8px_24px_rgba(75,21,40,0.06)] sm:flex-row sm:p-6 sm:text-left"
                   >
-                    Scopri il kit <span aria-hidden="true">→</span>
-                  </a>
-                </div>
-              </div>
-
-              {prodotti.length > 1 && (
-                <div className="border-t border-[#fbeaf0] bg-[#fffafd] px-5 py-4 sm:px-6">
-                  <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-[#993556]">
-                    La routine include anche
-                  </p>
-                  <div className="grid gap-2 sm:grid-cols-2">
-                    {prodotti.slice(1).map(prodotto => (
+                    <div className="flex size-28 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-[#fff7fa] sm:size-32">
+                      <img
+                        src={prodotto.immagine}
+                        alt={prodotto.nome}
+                        className="h-full w-full object-contain p-2"
+                        loading={index === 0 ? "eager" : "lazy"}
+                      />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-xs font-semibold uppercase tracking-wide text-[#E92176]">
+                        Kit consigliato {index + 1}
+                      </p>
+                      <h2 className="mt-1 text-lg font-semibold text-[#4B1528]">
+                        {prodotto.nome}
+                      </h2>
+                      <p className="mt-2 text-sm leading-relaxed text-[#72243E]">
+                        {prodotto.descrizione}
+                      </p>
                       <a
-                        key={prodotto.nome}
                         href={prodotto.link}
                         target="_blank"
                         rel="noreferrer"
-                        className="flex items-center gap-2 rounded-xl bg-white px-3 py-2.5 text-sm font-medium text-[#4B1528] transition-colors hover:bg-[#fbeaf0]"
+                        className="mt-3 inline-flex items-center gap-1 font-semibold text-[#E92176] hover:underline"
                       >
-                        <Check size={16} className="shrink-0 text-[#E92176]" />
-                        <span>{prodotto.nome}</span>
+                        Scopri il kit <span aria-hidden="true">→</span>
                       </a>
-                    ))}
-                  </div>
-                </div>
-              )}
+                    </div>
+                  </article>
+                ))}
+              </div>
             </div>
           )}
 
-          <div className="mx-auto mt-5 flex max-w-3xl flex-col gap-2 rounded-2xl border-2 border-dashed border-[#E92176] bg-[#fff7fa] px-5 py-4 text-center sm:flex-row sm:items-center sm:justify-between sm:text-left">
+          {coupon && <div className="mx-auto mt-5 flex max-w-4xl flex-col gap-4 rounded-2xl border-2 border-dashed border-[#E92176] bg-[#fff7fa] px-5 py-4 text-center sm:flex-row sm:items-center sm:justify-between sm:text-left">
             <span className="flex items-center justify-center gap-2 font-semibold text-[#72243E] sm:justify-start">
-              <Gift size={18} className="text-[#E92176]" />
-              <span><strong>RICCI15</strong> — 15% sul tuo kit</span>
+              <Gift size={18} className="shrink-0 text-[#E92176]" />
+              <span><strong>{coupon.code}</strong> — {coupon.percent}% sul tuo kit</span>
             </span>
-            <span className="text-xs font-medium text-[#993556]">Valido 48 ore</span>
-          </div>
+
+            {couponExpired ? (
+              <span className="rounded-xl bg-white px-4 py-2 text-sm font-semibold text-[#993556]">
+                Coupon scaduto
+              </span>
+            ) : (
+              <div className="flex flex-col items-center gap-1.5 sm:items-end">
+                <span className="text-[11px] font-semibold uppercase tracking-wide text-[#993556]">
+                  Il tuo coupon scade tra
+                </span>
+                <div className="flex items-center gap-1.5" aria-live="polite" aria-label={`Mancano ${countdown.hours} ore, ${countdown.minutes} minuti e ${countdown.seconds} secondi`}>
+                  {[
+                    [countdown.hours, "ore"],
+                    [countdown.minutes, "min"],
+                    [countdown.seconds, "sec"],
+                  ].map(([value, label]) => (
+                    <span key={label} className="min-w-13 rounded-xl bg-white px-2 py-1.5 text-center shadow-sm">
+                      <strong className="block text-base leading-none text-[#E92176]">
+                        {String(value).padStart(2, "0")}
+                      </strong>
+                      <small className="mt-1 block text-[9px] font-semibold uppercase tracking-wide text-[#993556]">
+                        {label}
+                      </small>
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>}
 
           {prodottoPrincipale && (
             <div className="mt-6 text-center">

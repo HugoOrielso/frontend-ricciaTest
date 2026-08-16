@@ -91,10 +91,23 @@ const buildQuizAnswers = (values: FormValues) =>
 
 const TestForm = () => {
     const API_URL = import.meta.env.VITE_API_URL
+    const [quizSessionId] = useState(() => {
+        const storageKey = "riccia_quiz_session_id"
+        try {
+            const stored = localStorage.getItem(storageKey)
+            if (stored) return stored
+            const created = crypto.randomUUID()
+            localStorage.setItem(storageKey, created)
+            return created
+        } catch {
+            return crypto.randomUUID()
+        }
+    })
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
     const [reply, setReply] = useState<string>("")
     const [prodottiTrovati, setProdottiTrovati] = useState<Prodotti[]>([])
     const [nomeRisultato, setNomeRisultato] = useState("")
+    const [coupon, setCoupon] = useState<{ code: string; percent: number; expiresAt: string } | null>(null)
     const [currentIndex, setCurrentIndex] = useState(0)
     const [direction, setDirection] = useState<"left" | "right">("right")
     const [formMessage, setFormMessage] = useState("")
@@ -225,6 +238,8 @@ const TestForm = () => {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
+                    sessionId: quizSessionId,
+                    sourceUrl: document.referrer || window.location.href,
                     email: values.email,
                     name: values.nome,
                     newsletterConsent: values.newsletterConsent,
@@ -249,9 +264,14 @@ const TestForm = () => {
                 throw new Error(data?.message || "Errore durante l'iscrizione")
             }
 
+            if (!data?.coupon?.code || !data?.coupon?.percent || !data?.coupon?.expiresAt) {
+                throw new Error("Il coupon non è stato ricevuto. Riprova.")
+            }
+
             setReply(testo)
             setProdottiTrovati(prodotti)
             setNomeRisultato(values.nome)
+            setCoupon(data.coupon)
         } catch (error) {
             setFormMessage(error instanceof Error ? error.message : "Si è verificato un errore. Riprova.")
         } finally {
@@ -266,31 +286,74 @@ const TestForm = () => {
     }
 
     return (
-        <div className="min-h-screen w-full flex items-start justify-center">
-            <div className="flex flex-col gap-2">
+        <div className="min-h-screen w-full flex items-center justify-center overflow-hidden p-2">
+            <div className="relative flex w-full max-w-6xl items-center justify-center py-3 lg:min-h-180">
+                {reply.length === 0 && (
+                    <div className="pointer-events-none absolute inset-0 hidden lg:block" aria-hidden="true">
+                        <img
+                            src="/images/prodottiriccia_1080x1080.webp"
+                            alt=""
+                            className="absolute left-2 top-28 w-44 -rotate-7 rounded-3xl object-cover shadow-[0_18px_35px_rgba(75,21,40,0.16)] xl:left-8 xl:w-52"
+                        />
+                        <img
+                            src="/images/shampoo_sito_1080x1080.webp"
+                            alt=""
+                            className="absolute right-2 top-36 w-40 rotate-7 rounded-3xl object-cover shadow-[0_18px_35px_rgba(75,21,40,0.16)] xl:right-8 xl:w-48"
+                        />
+                        <div className="absolute right-0 top-24 max-w-48 -rotate-3 rounded-2xl bg-[#fbeaf0] px-5 py-3 text-left text-sm font-semibold leading-snug text-[#72243E] shadow-[0_12px_25px_rgba(75,21,40,0.12)]">
+                            Sto sfidando le aspettative, non i ricci 🩷
+                        </div>
+                        <img
+                            src="/images/balsamo_1080x1080.webp"
+                            alt=""
+                            className="absolute bottom-12 left-10 w-36 rotate-6 rounded-3xl object-cover shadow-[0_18px_35px_rgba(75,21,40,0.14)] xl:left-20 xl:w-44"
+                        />
+                        <img
+                            src="/images/ChatGPTImage23apr2026_12_33_23_1080x1080.webp"
+                            alt=""
+                            className="absolute bottom-8 right-10 w-36 -rotate-6 rounded-3xl object-cover shadow-[0_18px_35px_rgba(75,21,40,0.14)] xl:right-20 xl:w-44"
+                        />
+                        <div className="absolute bottom-5 left-6 max-w-44 rotate-2 rounded-2xl bg-[#fbeaf0] px-5 py-3 text-left text-sm font-semibold leading-snug text-[#72243E] shadow-[0_12px_25px_rgba(75,21,40,0.12)] xl:left-14">
+                            Ogni riccio ha il suo carattere.
+                        </div>
+                        <div className="absolute bottom-28 right-0 max-w-44 -rotate-3 rounded-2xl bg-[#fbeaf0] px-5 py-3 text-left text-sm font-semibold leading-snug text-[#72243E] shadow-[0_12px_25px_rgba(75,21,40,0.12)]">
+                            Effetto crespo? Noi lo chiamiamo effetto wow.
+                        </div>
+                    </div>
+                )}
+
+                <div className={`${reply.length > 0 ? "hidden" : "flex"} relative z-10 mx-auto w-full max-w-2xl flex-col items-center justify-center gap-2`}>
                 {reply.length === 0 && (
                     <form
                         onSubmit={form.handleSubmit(onSubmit)}
                         className="w-full"
                     >
-                        <div className="bg-white rounded-3xl shadow-sm" style={{ border: `1px solid ${PINK_MID}` }}>
-                            <div className="px-6 pt-6 pb-4" style={{ borderBottom: `1px solid ${PINK_LIGHT}` }}>
-                                <div className="flex items-center gap-2 mb-1">
-                                    <div className="w-7 h-7 rounded-full flex items-center justify-center" style={{ background: PINK }}>
-                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round">
-                                            <path d="M12 2a5 5 0 0 1 5 5c0 3-2 5-5 8-3-3-5-5-5-8a5 5 0 0 1 5-5z" />
-                                        </svg>
-                                    </div>
+                        <div className="relative overflow-hidden bg-white rounded-3xl shadow-sm" style={{ border: `1px solid ${PINK_MID}` }}>
+                            <img
+                                src="/images/balsamo_1080x1080.webp"
+                                alt=""
+                                aria-hidden="true"
+                                className="pointer-events-none absolute -bottom-8 -left-8 z-0 size-40 -rotate-12 rounded-3xl object-cover opacity-15 blur-[2px] lg:hidden"
+                            />
+                            <div className="relative z-10 px-5 pt-5 pb-3" style={{ borderBottom: `1px solid ${PINK_LIGHT}` }}>
+                                <img
+                                    src="/images/ChatGPTImage23apr2026_12_33_23_1080x1080.webp"
+                                    alt=""
+                                    aria-hidden="true"
+                                    className="pointer-events-none absolute right-4 top-4 size-16 rotate-6 rounded-2xl object-cover opacity-90 shadow-md lg:hidden"
+                                />
+                                <div className="mb-1.5 flex flex-col items-center gap-1.5">
+
                                     <h1 className="text-base font-semibold" style={{ color: TEXT_DARK }}>
                                         Conosco i Miei Ricci
                                     </h1>
                                 </div>
-                                <p style={{ color: TEXT_SOFT }}>
-                                    Compila il test e scopri i prodotti più adatti ai tuoi ricci
+                                <p className="mx-auto max-w-md text-center text-sm" style={{ color: TEXT_SOFT }}>
+                                    Non esiste una routine perfetta per tutte. Esiste quella giusta per te. — 7 domande, niente fuffa.
                                 </p>
                             </div>
 
-                            <div className="flex flex-col gap-3 px-6 pt-5">
+                            <div className="relative z-10 flex flex-col gap-2.5 px-5 pt-4">
                                 <span className="text-start text-xs font-semibold uppercase tracking-wide" style={{ color: TEXT_SOFT }}>
                                     {isConfirmingLead ? "Conferma dati" : isLeadStep ? "Invio risultato" : `Domanda ${currentIndex + 1} di ${domandeCMR.length}`}
                                 </span>
@@ -302,7 +365,7 @@ const TestForm = () => {
                                 </div>
                             </div>
 
-                            <div className="px-6 pt-4 pb-2 min-h-70">
+                            <div className="relative z-10 px-5 pt-3 pb-2 min-h-60">
                                 <AnimatePresence mode="wait">
                                     <motion.div
                                         key={isConfirmingLead ? "confirm-lead" : currentIndex}
@@ -310,23 +373,23 @@ const TestForm = () => {
                                         animate={{ opacity: 1, x: 0 }}
                                         exit={{ opacity: 0, x: direction === "right" ? -40 : 40 }}
                                         transition={{ duration: 0.25, ease: "easeOut" }}
-                                        className="flex flex-col gap-4"
+                                        className="flex flex-col gap-3"
                                     >
                                         {!isLeadStep && domanda && domandaId && (
                                             <>
                                                 <div>
-                                                    <h2 className="text-center text-xl font-semibold mb-1" style={{ color: TEXT_DARK }}>
+                                                    <h2 className="text-center text-lg font-semibold mb-1" style={{ color: TEXT_DARK }}>
                                                         {domandaId === "personalitaRicci" ? domanda.titolo : cleanQuestionTitle(domanda.titolo)}
                                                     </h2>
                                                     {domanda.descrizione && (
-                                                        <p className="text-start leading-relaxed" style={{ color: TEXT_MID }}>
+                                                        <p className="text-start text-sm leading-relaxed" style={{ color: TEXT_MID }}>
                                                             {domanda.descrizione}
                                                         </p>
                                                     )}
                                                 </div>
 
                                                 {domandaId === "sts" ? (
-                                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3" role="group">
+                                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5" role="group">
                                                         {domanda.opzioni.map((opzione, optionIndex) => {
                                                             const selectedValues = form.watch("sts")
                                                             const checked = selectedValues.includes(opzione.value)
@@ -336,7 +399,7 @@ const TestForm = () => {
                                                                 <label
                                                                     key={opzione.id}
                                                                     htmlFor={opzione.id}
-                                                                    className="relative flex min-h-36 flex-col items-center justify-center gap-3 rounded-xl p-5 cursor-pointer text-center transition-all duration-150 hover:-translate-y-0.5 hover:shadow-md"
+                                                                    className="relative flex min-h-28 flex-col items-center justify-center gap-2 rounded-xl p-3.5 cursor-pointer text-center transition-all duration-150 hover:-translate-y-0.5 hover:shadow-md"
                                                                     style={{
                                                                         border: `1.5px solid ${checked ? PINK : PINK_MID}`,
                                                                         background: checked ? PINK_LIGHT : "white",
@@ -362,10 +425,10 @@ const TestForm = () => {
                                                                         className="absolute right-3 top-3 size-4 shrink-0"
                                                                         style={{ accentColor: PINK }}
                                                                     />
-                                                                    <span className="flex size-12 items-center justify-center rounded-full" style={{ background: PINK_LIGHT, color: TEXT_SOFT }}>
-                                                                        <Icon size={22} strokeWidth={1.9} />
+                                                                    <span className="flex size-10 items-center justify-center rounded-full" style={{ background: PINK_LIGHT, color: TEXT_SOFT }}>
+                                                                        <Icon size={19} strokeWidth={1.9} />
                                                                     </span>
-                                                                    <span className="max-w-112 text-sm sm:text-base leading-snug font-semibold" style={{ color: checked ? TEXT_DARK : TEXT_MID }}>
+                                                                    <span className="max-w-112 text-sm leading-snug font-semibold" style={{ color: checked ? TEXT_DARK : TEXT_MID }}>
                                                                         {opzione.label}
                                                                     </span>
                                                                 </label>
@@ -379,7 +442,7 @@ const TestForm = () => {
                                                             form.setValue(domandaId, v, { shouldValidate: true })
                                                             setFormMessage("")
                                                         }}
-                                                        className="grid grid-cols-1 sm:grid-cols-2 gap-3"
+                                                        className="grid grid-cols-1 sm:grid-cols-2 gap-2.5"
                                                     >
                                                         {domanda.opzioni.map((opzione) => {
                                                             const checked = form.watch(domandaId) === opzione.value
@@ -396,7 +459,7 @@ const TestForm = () => {
                                                                     }}
                                                                 >
                                                                     <span
-                                                                        className={`grid h-48 w-full overflow-hidden bg-pink-50 ${images.length > 2 ? "grid-cols-2 grid-rows-2" : images.length === 2 ? "grid-cols-2" : "grid-cols-1"}`}
+                                                                        className={`grid h-36 w-full overflow-hidden bg-pink-50 ${images.length > 2 ? "grid-cols-2 grid-rows-2" : images.length === 2 ? "grid-cols-2" : "grid-cols-1"}`}
                                                                     >
                                                                         {images.map((image, imageIndex) => (
                                                                             <img
@@ -414,7 +477,7 @@ const TestForm = () => {
                                                                         className="absolute right-3 top-3 z-10 size-6 bg-white shadow-sm"
                                                                         style={{ color: PINK, borderColor: checked ? PINK : "white" } as React.CSSProperties}
                                                                     />
-                                                                    <span className="px-4 py-4 leading-snug font-semibold" style={{ color: checked ? TEXT_DARK : TEXT_MID }}>
+                                                                    <span className="px-3 py-3 text-sm leading-snug font-semibold" style={{ color: checked ? TEXT_DARK : TEXT_MID }}>
                                                                         {opzione.label}
                                                                     </span>
                                                                 </label>
@@ -428,7 +491,7 @@ const TestForm = () => {
                                                             form.setValue(domandaId, v, { shouldValidate: true })
                                                             setFormMessage("")
                                                         }}
-                                                        className="grid grid-cols-1 sm:grid-cols-2 gap-3"
+                                                        className="grid grid-cols-1 sm:grid-cols-2 gap-2.5"
                                                     >
                                                         {domanda.opzioni.map((opzione, optionIndex) => {
                                                             const checked = form.watch(domandaId) === opzione.value
@@ -437,7 +500,7 @@ const TestForm = () => {
                                                                 <label
                                                                     key={opzione.id}
                                                                     htmlFor={opzione.id}
-                                                                    className="relative flex min-h-36 flex-col items-center justify-center gap-3 rounded-xl p-5 cursor-pointer text-center transition-all duration-150 hover:-translate-y-0.5 hover:shadow-md"
+                                                                    className="relative flex min-h-28 flex-col items-center justify-center gap-2 rounded-xl p-3.5 cursor-pointer text-center transition-all duration-150 hover:-translate-y-0.5 hover:shadow-md"
                                                                     style={{
                                                                         border: `1.5px solid ${checked ? PINK : PINK_MID}`,
                                                                         background: checked ? "#fff8fb" : "white",
@@ -450,10 +513,10 @@ const TestForm = () => {
                                                                         className="absolute right-3 top-3 size-4"
                                                                         style={{ color: PINK, borderColor: checked ? PINK : PINK_MID } as React.CSSProperties}
                                                                     />
-                                                                    <span className="flex size-12 items-center justify-center rounded-full" style={{ background: PINK_LIGHT, color: TEXT_SOFT }}>
-                                                                        <Icon size={22} strokeWidth={1.9} />
+                                                                    <span className="flex size-10 items-center justify-center rounded-full" style={{ background: PINK_LIGHT, color: TEXT_SOFT }}>
+                                                                        <Icon size={19} strokeWidth={1.9} />
                                                                     </span>
-                                                                    <span className="max-w-112 text-sm sm:text-base leading-snug font-semibold" style={{ color: checked ? TEXT_DARK : TEXT_MID }}>
+                                                                    <span className="max-w-112 text-sm leading-snug font-semibold" style={{ color: checked ? TEXT_DARK : TEXT_MID }}>
                                                                         {opzione.label}
                                                                     </span>
                                                                 </label>
@@ -473,7 +536,7 @@ const TestForm = () => {
                                         {isLeadStep && !isConfirmingLead && (
                                             <div className="flex flex-col gap-4">
                                                 <div className="space-y-3 text-start">
-                                                    <h1 className="text-4xl lg:text-5xl font-semibold" style={{ color: TEXT_DARK }}>
+                                                    <h1 className="text-3xl lg:text-4xl font-semibold" style={{ color: TEXT_DARK }}>
                                                         🩷 La tua routine è pronta
                                                     </h1>
                                                     <p style={{ color: TEXT_MID }}>
@@ -615,7 +678,7 @@ const TestForm = () => {
                             </div>
 
                             {isSubmitting && (
-                                <div className="mx-6 mb-4 rounded-2xl p-5 text-center" style={{ background: PINK_LIGHT, border: `1px solid ${PINK_MID}` }}>
+                                <div className="relative z-10 mx-6 mb-4 rounded-2xl p-5 text-center" style={{ background: PINK_LIGHT, border: `1px solid ${PINK_MID}` }}>
                                     <div className="flex flex-col items-center gap-3">
                                         <div className="w-10 h-10 rounded-full border-[3px] border-t-transparent animate-spin"
                                             style={{ borderColor: `${PINK_MID} ${PINK_MID} ${PINK_MID} transparent` }} />
@@ -630,7 +693,7 @@ const TestForm = () => {
                             )}
 
                             {!isSubmitting && (
-                                <div className="px-6 pb-6 pt-2 flex flex-col gap-3">
+                                <div className="relative z-10 px-5 pb-5 pt-1.5 flex flex-col gap-2.5">
                                     <div className="flex justify-between gap-3">
                                         <button
                                             type="button"
@@ -678,13 +741,15 @@ const TestForm = () => {
                         </div>
                     </form>
                 )}
-            </div>
+                </div>
             {reply.length > 0 && (
                 <Reply
                     nome={nomeRisultato}
                     prodotti={prodottiTrovati}
+                    coupon={coupon}
                 />
             )}
+            </div>
         </div>
     )
 }
