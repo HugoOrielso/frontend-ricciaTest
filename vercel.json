@@ -1,0 +1,13 @@
+{
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "Content-Security-Policy",
+          "value": "frame-ancestors 'self' https://*.myshopify.com https://riccia.it https://www.riccia.it;"
+        }
+      ]
+    }
+  ]
+}
