@@ -6,7 +6,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { domandeCMR, type DomandaID } from "./data"
 import { motion, AnimatePresence } from "motion/react"
 import {
-    ArrowLeft, ArrowRight, Check, Mail, MailWarningIcon, Pencil,
+    ArrowLeft, ArrowRight, Mail,
     Droplet, Droplets, CalendarDays, Sparkles, Waves, FlaskConical,
     Paintbrush, Activity, Pill, HardHat, CircleOff, Feather, Layers3,
     CircleGauge, Cloud, Wind, Sun, Volume2, Heart, ShieldCheck, HelpCircle,
@@ -56,6 +56,12 @@ const CURL_IMAGES: Record<string, string[]> = {
         "/images/kindAir/Ricci%20stretti%20o%20afro%201.webp",
     ],
 }
+
+const ROTATED_CURL_IMAGES = new Set([
+    "/images/kindAir/Onde%20morbide%202.webp",
+    "/images/kindAir/Ricci%20a%20S%201.webp",
+    "/images/kindAir/Ricci%20stretti%20o%20afro%201.webp",
+])
 
 const formSchema = z.object({
     guidaLavaggio: z.string({ required_error: "Seleziona una risposta" }).min(1, "Seleziona una risposta"),
@@ -111,14 +117,13 @@ const TestForm = () => {
     const [currentIndex, setCurrentIndex] = useState(0)
     const [direction, setDirection] = useState<"left" | "right">("right")
     const [formMessage, setFormMessage] = useState("")
-    const [isConfirmingLead, setIsConfirmingLead] = useState(false)
 
     const isLeadStep = currentIndex === domandeCMR.length
     const domanda = isLeadStep ? null : domandeCMR[currentIndex]
     const domandaId = domanda?.id as DomandaID | undefined
     const questionCount = domandeCMR.length
     const isFirst = currentIndex === 0
-    const isLast = isLeadStep || isConfirmingLead
+    const isLast = isLeadStep
 
     const form = useForm<FormValues>({
         resolver: zodResolver(formSchema),
@@ -170,7 +175,7 @@ const TestForm = () => {
             window.removeEventListener("load", sendHeight)
             window.removeEventListener("resize", sendHeight)
         }
-    }, [currentIndex, reply, prodottiTrovati.length, isConfirmingLead])
+    }, [currentIndex, reply, prodottiTrovati.length])
 
     const nextQuestion = async () => {
         setFormMessage("")
@@ -188,13 +193,6 @@ const TestForm = () => {
     }
 
     const prevQuestion = () => {
-        if (isConfirmingLead) {
-            setFormMessage("")
-            setDirection("left")
-            setIsConfirmingLead(false)
-            return
-        }
-
         if (!isFirst) {
             setFormMessage("")
             setDirection("left")
@@ -204,19 +202,6 @@ const TestForm = () => {
 
 
     async function onSubmit(): Promise<void> {
-        setFormMessage("")
-        setDirection("right")
-        setIsConfirmingLead(true)
-    }
-
-    async function submitConfirmed(): Promise<void> {
-        const isValid = await form.trigger(["nome", "email", "newsletterConsent"])
-        if (!isValid) {
-            setDirection("left")
-            setIsConfirmingLead(false)
-            return
-        }
-
         const values = form.getValues()
         setFormMessage("")
 
@@ -279,12 +264,6 @@ const TestForm = () => {
         }
     }
 
-    const editLeadData = () => {
-        setFormMessage("")
-        setDirection("left")
-        setIsConfirmingLead(false)
-    }
-
     return (
         <div className="min-h-screen w-full flex items-center justify-center overflow-hidden p-2">
             <div className="relative flex w-full max-w-6xl items-center justify-center py-3 lg:min-h-180">
@@ -335,6 +314,7 @@ const TestForm = () => {
                                 aria-hidden="true"
                                 className="pointer-events-none absolute -bottom-8 -left-8 z-0 size-40 -rotate-12 rounded-3xl object-cover opacity-15 blur-[2px] lg:hidden"
                             />
+                            {currentIndex === 0 && (
                             <div className="relative z-10 px-5 pt-5 pb-3" style={{ borderBottom: `1px solid ${PINK_LIGHT}` }}>
                                 <img
                                     src="/images/ChatGPTImage23apr2026_12_33_23_1080x1080.webp"
@@ -345,17 +325,18 @@ const TestForm = () => {
                                 <div className="mb-1.5 flex flex-col items-center gap-1.5">
 
                                     <h1 className="text-base font-semibold" style={{ color: TEXT_DARK }}>
-                                        Conosco i Miei Ricci
+                                        Fai il Test: Conosco i miei ricci
                                     </h1>
                                 </div>
                                 <p className="mx-auto max-w-md text-center text-sm" style={{ color: TEXT_SOFT }}>
-                                    Non esiste una routine perfetta per tutte. Esiste quella giusta per te. — 7 domande, niente fuffa.
+                                    Non esiste una routine perfetta per tutte. Esiste quella giusta per te: scoprila ora.
                                 </p>
                             </div>
+                            )}
 
                             <div className="relative z-10 flex flex-col gap-2.5 px-5 pt-4">
                                 <span className="text-start text-xs font-semibold uppercase tracking-wide" style={{ color: TEXT_SOFT }}>
-                                    {isConfirmingLead ? "Conferma dati" : isLeadStep ? "Invio risultato" : `Domanda ${currentIndex + 1} di ${domandeCMR.length}`}
+                                    {isLeadStep ? "Invio risultato" : `Domanda ${currentIndex + 1} di ${domandeCMR.length}`}
                                 </span>
                                 <div className="grid w-full gap-1.5" style={{ gridTemplateColumns: `repeat(${questionCount}, minmax(0, 1fr))` }} aria-label={`Progresso: ${Math.min(currentIndex + 1, questionCount)} di ${questionCount}`}>
                                     {Array.from({ length: questionCount }).map((_, i) => (
@@ -368,7 +349,7 @@ const TestForm = () => {
                             <div className="relative z-10 px-5 pt-3 pb-2 min-h-60">
                                 <AnimatePresence mode="wait">
                                     <motion.div
-                                        key={isConfirmingLead ? "confirm-lead" : currentIndex}
+                                        key={currentIndex}
                                         initial={{ opacity: 0, x: direction === "right" ? 40 : -40 }}
                                         animate={{ opacity: 1, x: 0 }}
                                         exit={{ opacity: 0, x: direction === "right" ? -40 : 40 }}
@@ -467,7 +448,7 @@ const TestForm = () => {
                                                                                 src={image}
                                                                                 alt={`${opzione.label}, esempio ${imageIndex + 1}`}
                                                                                 loading="lazy"
-                                                                                className="h-full min-h-0 w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+                                                                                className={`h-full min-h-0 w-full object-cover transition-transform duration-300 ${ROTATED_CURL_IMAGES.has(image) ? "rotate-90 scale-[1.4] group-hover:scale-[1.45]" : "group-hover:scale-[1.03]"}`}
                                                                             />
                                                                         ))}
                                                                     </span>
@@ -533,7 +514,7 @@ const TestForm = () => {
                                             </>
                                         )}
 
-                                        {isLeadStep && !isConfirmingLead && (
+                                        {isLeadStep && (
                                             <div className="flex flex-col gap-4">
                                                 <div className="space-y-3 text-start">
                                                     <h1 className="text-3xl lg:text-4xl font-semibold" style={{ color: TEXT_DARK }}>
@@ -627,47 +608,6 @@ const TestForm = () => {
                                             </div>
                                         )}
 
-                                        {isConfirmingLead && (
-                                            <div className="flex flex-col gap-5 text-start">
-                                                <div className="space-y-3">
-                                                    <div className="w-11 h-11 rounded-full flex items-center justify-center" style={{ background: PINK_LIGHT, color: PINK }}>
-                                                        <Check size={22} />
-                                                    </div>
-                                                    <h1 className="text-3xl lg:text-4xl font-semibold" style={{ color: TEXT_DARK }}>
-                                                        Confermi i tuoi dati?
-                                                    </h1>
-                                                    <p className="leading-relaxed" style={{ color: TEXT_MID }}>
-                                                        Useremo questi dati per inviarti la routine personalizzata e i consigli richiesti.
-                                                    </p>
-                                                </div>
-
-                                                <div className="grid grid-cols-1 gap-3">
-                                                    <div className="rounded-2xl p-4" style={{ border: `1.5px solid ${PINK_MID}`, background: PINK_LIGHT }}>
-                                                        <p className="text-sm font-semibold uppercase" style={{ color: TEXT_SOFT }}>
-                                                            Nome
-                                                        </p>
-                                                        <p className="text-lg font-semibold break-words" style={{ color: TEXT_DARK }}>
-                                                            {form.watch("nome")}
-                                                        </p>
-                                                    </div>
-                                                    <div className="rounded-2xl p-4" style={{ border: `1.5px solid ${PINK_MID}`, background: PINK_LIGHT }}>
-                                                        <p className="text-sm font-semibold uppercase" style={{ color: TEXT_SOFT }}>
-                                                            Email
-                                                        </p>
-                                                        <p className="text-lg font-semibold break-words" style={{ color: TEXT_DARK }}>
-                                                            {form.watch("email")}
-                                                        </p>
-                                                    </div>
-                                                    <div className="flex items-center gap-2">
-                                                        <MailWarningIcon />
-                                                        <p>
-                                                            controlla che la tua e-mail sia corretta altrimenti non ti arriverà la routine
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        )}
-
                                         {formMessage && (
                                             <p className="rounded-xl px-4 py-3 text-start" style={{ color: PINK, background: PINK_LIGHT }}>
                                                 {formMessage}
@@ -697,26 +637,16 @@ const TestForm = () => {
                                     <div className="flex justify-between gap-3">
                                         <button
                                             type="button"
-                                            onClick={isConfirmingLead ? editLeadData : prevQuestion}
-                                            disabled={isFirst && !isConfirmingLead}
+                                            onClick={prevQuestion}
+                                            disabled={isFirst}
                                             className="flex items-center gap-1.5 px-4 py-2 rounded-xl font-medium transition-all duration-150 disabled:opacity-30 cursor-pointer"
                                             style={{ border: `1.5px solid ${PINK_MID}`, color: TEXT_MID, background: "white" }}
                                         >
-                                            {isConfirmingLead ? <Pencil size={14} /> : <ArrowLeft size={14} />}
-                                            {isConfirmingLead ? "Modifica dati" : "Indietro"}
+                                            <ArrowLeft size={14} />
+                                            Indietro
                                         </button>
 
-                                        {isConfirmingLead ? (
-                                            <button
-                                                type="button"
-                                                onClick={submitConfirmed}
-                                                className="flex items-center gap-1.5 px-5 py-2 rounded-xl font-semibold transition-all duration-150 cursor-pointer"
-                                                style={{ background: PINK, color: "white" }}
-                                            >
-                                                <Check size={16} />
-                                                Confermo
-                                            </button>
-                                        ) : !isLast ? (
+                                        {!isLast ? (
                                             <button
                                                 type="button"
                                                 onClick={nextQuestion}
