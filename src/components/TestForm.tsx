@@ -36,32 +36,21 @@ const cleanQuestionTitle = (title: string) => title.replace(/^\d+\.\s*/, "")
 
 const CURL_IMAGES: Record<string, string[]> = {
     "onde-morbide": [
-        "/images/kindAir/Onde%20morbide%201.webp",
-        "/images/kindAir/Onde%20morbide%202.webp",
+        "/foto%20ricci/1.png",
     ],
     "ricci-definiti": [
-        "/images/kindAir/Ricci%20a%20S%201.webp",
-        "/images/kindAir/Ricci%20a%20S%202.webp",
+        "/foto%20ricci/4.png",
     ],
     "ricci-ribelli": [
-        "/images/kindAir/Ricci%20irregolari%20e%20ribelli.webp",
+        "/foto%20ricci/3.png",
     ],
     "ricci-stretti-afro": [
-        "/images/kindAir/Ricci%20stretti%20o%20afro%201.webp",
+        "/foto%20ricci/2.png",
     ],
     "mix-tutto": [
-        "/images/kindAir/Onde%20morbide%201.webp",
-        "/images/kindAir/Ricci%20a%20S%202.webp",
-        "/images/kindAir/Ricci%20irregolari%20e%20ribelli.webp",
-        "/images/kindAir/Ricci%20stretti%20o%20afro%201.webp",
+        "/foto%20ricci/5.png",
     ],
 }
-
-const ROTATED_CURL_IMAGES = new Set([
-    "/images/kindAir/Onde%20morbide%202.webp",
-    "/images/kindAir/Ricci%20a%20S%201.webp",
-    "/images/kindAir/Ricci%20stretti%20o%20afro%201.webp",
-])
 
 const formSchema = z.object({
     guidaLavaggio: z.string({ required_error: "Seleziona una risposta" }).min(1, "Seleziona una risposta"),
@@ -316,12 +305,6 @@ const TestForm = () => {
                             />
                             {currentIndex === 0 && (
                             <div className="relative z-10 px-5 pt-5 pb-3" style={{ borderBottom: `1px solid ${PINK_LIGHT}` }}>
-                                <img
-                                    src="/images/ChatGPTImage23apr2026_12_33_23_1080x1080.webp"
-                                    alt=""
-                                    aria-hidden="true"
-                                    className="pointer-events-none absolute right-4 top-4 size-16 rotate-6 rounded-2xl object-cover opacity-90 shadow-md lg:hidden"
-                                />
                                 <div className="mb-1.5 flex flex-col items-center gap-1.5">
 
                                     <h1 className="text-base font-semibold" style={{ color: TEXT_DARK }}>
@@ -439,16 +422,14 @@ const TestForm = () => {
                                                                         boxShadow: checked ? "0 12px 28px rgba(233, 33, 118, 0.14)" : "0 5px 16px rgba(75, 21, 40, 0.06)",
                                                                     }}
                                                                 >
-                                                                    <span
-                                                                        className={`grid h-36 w-full overflow-hidden bg-pink-50 ${images.length > 2 ? "grid-cols-2 grid-rows-2" : images.length === 2 ? "grid-cols-2" : "grid-cols-1"}`}
-                                                                    >
+                                                                    <span className="grid aspect-square w-full grid-cols-1 overflow-hidden bg-pink-50">
                                                                         {images.map((image, imageIndex) => (
                                                                             <img
                                                                                 key={image}
                                                                                 src={image}
                                                                                 alt={`${opzione.label}, esempio ${imageIndex + 1}`}
                                                                                 loading="lazy"
-                                                                                className={`h-full min-h-0 w-full object-cover transition-transform duration-300 ${ROTATED_CURL_IMAGES.has(image) ? "rotate-90 scale-[1.4] group-hover:scale-[1.45]" : "group-hover:scale-[1.03]"}`}
+                                                                                className="h-full min-h-0 w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
                                                                             />
                                                                         ))}
                                                                     </span>
