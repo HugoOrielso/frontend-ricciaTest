@@ -12,10 +12,16 @@ export const prodottiDisponibili = [
     link: "https://laragazzariccia.com/products/shampoo-balsamo-ricci-perfetti",
   },
   {
-    nome: "Lavaggio invertito + scrub",
+    nome: "Kit Lavaggio base",
     descrizione: "Un kit lavaggio essenziale per iniziare a prenderti cura dei tuoi capelli. I ricci belli non iniziano dallo styling, iniziano dal lavaggio.",
     immagine: "https://laragazzariccia.com/cdn/shop/files/ChatGPTImage23apr2026_12_33_23_1080x1080.png",
     link: "https://laragazzariccia.com/products/kit-lavaggio-riccia-essential",
+  },
+  {
+    nome: "Kit Lavaggio Riccia",
+    descrizione: "Una routine completa con scrub, shampoo, balsamo e leave-in spray per detergere, districare e mantenere i ricci definiti e leggeri più a lungo.",
+    immagine: "/images/prodottiriccia_1080x1080.webp",
+    link: "https://laragazzariccia.com/products/kit-lavaggio-riccia",
   },
   {
     nome: "Kit Volume WOW",

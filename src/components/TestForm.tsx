@@ -9,7 +9,7 @@ import {
     ArrowLeft, ArrowRight, Mail,
     Droplet, Droplets, CalendarDays, Sparkles, Waves, FlaskConical,
     Paintbrush, Activity, Pill, HardHat, CircleOff, Feather, Layers3,
-    CircleGauge, Cloud, Wind, Sun, Volume2, Heart, ShieldCheck, HelpCircle,
+    CircleGauge, Cloud, Sun, Volume2, Heart, ShieldCheck, HelpCircle,
     type LucideIcon,
 } from "lucide-react"
 import Reply from "./Reply"
@@ -24,10 +24,10 @@ const TEXT_SOFT = "#993556"
 const PRIVACY_URL = "https://laragazzariccia.com/pages/privacy-policy"
 
 const OPTION_ICONS: Record<Exclude<DomandaID, "personalitaRicci">, LucideIcon[]> = {
-    guidaLavaggio: [Droplet, Droplets, Waves, CalendarDays],
+    guidaLavaggio: [CalendarDays, Droplets],
     porosita: [FlaskConical, Droplets, Layers3, Sparkles],
     sts: [Paintbrush, Activity, Pill, HardHat, CircleOff],
-    spessoreDensita: [Feather, Wind, CircleGauge, Volume2, Layers3],
+    spessoreDensita: [Feather, Layers3],
     problemaPrincipale: [Cloud, Volume2, Sun, Waves, CalendarDays, Droplet, HelpCircle],
     obiettivoDesiderato: [Sparkles, Volume2, Heart, Feather, CircleGauge, ShieldCheck],
 }
@@ -35,20 +35,22 @@ const OPTION_ICONS: Record<Exclude<DomandaID, "personalitaRicci">, LucideIcon[]>
 const cleanQuestionTitle = (title: string) => title.replace(/^\d+\.\s*/, "")
 
 const CURL_IMAGES: Record<string, string[]> = {
-    "onde-morbide": [
-        "/foto%20ricci/1.png",
+    "onde": [
+        "/images/kindAir/Onde%20morbide%201.webp",
+        "/images/kindAir/Onde%20morbide%202%20upright.webp",
     ],
-    "ricci-definiti": [
-        "/foto%20ricci/4.png",
-    ],
-    "ricci-ribelli": [
-        "/foto%20ricci/3.png",
-    ],
-    "ricci-stretti-afro": [
+    "ricci-spirale": [
         "/foto%20ricci/2.png",
     ],
-    "mix-tutto": [
-        "/foto%20ricci/5.png",
+    "ricci-ribelli": [
+        "/images/kindAir/Ricci%20irregolari%20e%20ribelli.webp",
+    ],
+    "ricci-stretti-afro": [
+        "/images/kindAir/Ricci%20stretti%20o%20afro%201%20upright.webp",
+    ],
+    "ricci-s": [
+        "/images/kindAir/Ricci%20a%20S%201%20upright.webp",
+        "/images/kindAir/Ricci%20a%20S%202.webp",
     ],
 }
 
@@ -422,7 +424,10 @@ const TestForm = () => {
                                                                         boxShadow: checked ? "0 12px 28px rgba(233, 33, 118, 0.14)" : "0 5px 16px rgba(75, 21, 40, 0.06)",
                                                                     }}
                                                                 >
-                                                                    <span className="grid aspect-square w-full grid-cols-1 overflow-hidden bg-pink-50">
+                                                                    <span
+                                                                        className="grid aspect-square w-full overflow-hidden bg-pink-50"
+                                                                        style={{ gridTemplateColumns: `repeat(${images.length || 1}, minmax(0, 1fr))` }}
+                                                                    >
                                                                         {images.map((image, imageIndex) => (
                                                                             <img
                                                                                 key={image}

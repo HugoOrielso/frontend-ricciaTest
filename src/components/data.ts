@@ -1,13 +1,11 @@
 export const domandeCMR = [
   {
     id: "guidaLavaggio",
-    titolo: "1. Dopo quanti giorni senti il bisogno di lavare i tuoi ricci?",
+    titolo: "1. Quante volte lavi i capelli in una settimana?",
     descrizione: "",
     opzioni: [
-      { id: "dopo-1-giorno", value: "dopo-1-giorno", label: "Dopo 1 giorno" },
-      { id: "dopo-2-3-giorni", value: "dopo-2-3-giorni", label: "Dopo 2-3 giorni" },
-      { id: "dopo-4-5-giorni", value: "dopo-4-5-giorni", label: "Dopo 4-5 giorni" },
-      { id: "una-settimana", value: "una-settimana", label: "Potrei stare anche una settimana" },
+      { id: "massimo-una-volta", value: "massimo-una-volta", label: "Al massimo una volta a settimana" },
+      { id: "piu-volte", value: "piu-volte", label: "Più volte a settimana" },
     ],
   },
   {
@@ -35,14 +33,11 @@ export const domandeCMR = [
   },
   {
     id: "spessoreDensita",
-    titolo: "4. Come descriveresti i tuoi capelli nella vita reale?",
+    titolo: "4. Paragonando i tuoi capelli a un filo di cotone sono più spessi o più fini rispetto al filo?",
     descrizione: "",
     opzioni: [
-      { id: "fini-pochi", value: "fini-pochi", label: "Fini e pochi" },
-      { id: "fini-tanti", value: "fini-tanti", label: "Fini e tanti" },
-      { id: "medi-normali", value: "medi-normali", label: "Medi e normali" },
-      { id: "grossi-voluminosi", value: "grossi-voluminosi", label: "Grossi e voluminosi" },
-      { id: "tantissimi-difficili", value: "tantissimi-difficili", label: "Tantissimi e difficili da gestire" },
+      { id: "fini", value: "fini", label: "Fini" },
+      { id: "spessi", value: "spessi", label: "Spessi" },
     ],
   },
   {
@@ -50,11 +45,11 @@ export const domandeCMR = [
     titolo: "5. I tuoi ricci senza styling assomigliano di più a...",
     descrizione: "",
     opzioni: [
-      { id: "onde-morbide", value: "onde-morbide", label: "Onde morbide" },
-      { id: "ricci-definiti", value: "ricci-definiti", label: "Ricci definiti" },
+      { id: "onde", value: "onde", label: "Onde" },
+      { id: "ricci-spirale", value: "ricci-spirale", label: "Ricci a spirale" },
       { id: "ricci-ribelli", value: "ricci-ribelli", label: "Ricci irregolari e ribelli" },
       { id: "ricci-stretti-afro", value: "ricci-stretti-afro", label: "Ricci molto stretti o afro" },
-      { id: "mix-tutto", value: "mix-tutto", label: "Un mix di tutto" },
+      { id: "ricci-s", value: "ricci-s", label: "Ricci a S" },
     ],
   },
   {
