@@ -228,7 +228,9 @@ const TestForm = () => {
                     prodotti: prodotti.map(p => ({
                         nome: p.nome,
                         descrizione: p.descrizione,
-                        immagine: p.immagine,
+                        immagine: p.immagine.startsWith("/")
+                            ? new URL(p.immagine, window.location.origin).href
+                            : p.immagine,
                         link: p.link,
                     })),
                 }),

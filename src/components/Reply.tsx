@@ -54,7 +54,7 @@ const Reply = ({
           {prodotti.length > 0 && (
             <div className="mx-auto mt-7 max-w-4xl">
               <p className="mb-4 text-center text-xs font-semibold uppercase tracking-wide text-[#E92176]">
-                I 3 kit consigliati per la tua routine
+                {prodotti.length === 1 ? "prodotto consigliato" : "prodotti consigliati"} per la tua routine
               </p>
               <div className="flex flex-col gap-4">
                 {prodotti.map((prodotto, index) => (

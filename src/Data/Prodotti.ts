@@ -1,9 +1,15 @@
 export const prodottiDisponibili = [
   {
-    nome: "Kit Idratazione profonda",
-    descrizione: "Un kit dedicato all'idratazione profonda del capello. Indicato quando i ricci risultano secchi, spenti e poco flessibili. L'olio aiuta a ricostruire la barriera lipidica, mentre il trattamento idratante supporta la corretta idratazione della fibra.",
-    immagine: "https://laragazzariccia.com/cdn/shop/files/KitNutrire_1_1080x1080.png",
-    link: "https://laragazzariccia.com/products/kit-nutrimento-1",
+    nome: "Kit Recovery – Balsamo + Booster Lipidico",
+    descrizione: "Kit composto da Balsamo Riccia e Booster Lipidico perfetto per il trattamento super idratante che dona morbidezza, elasticità e definizione ai tuoi ricci, lasciandoli lucenti e sani.",
+    immagine: "/images/kit_recovery.png",
+    link: "https://laragazzariccia.com/products/kit-recovery-1",
+  },
+  {
+    nome: "Balsamo Riccia",
+    descrizione: "Balsamo nutriente e districante studiato per ammorbidire, districare e controllare il crespo senza appesantire, mantenendo il riccio morbido, elastico e facilmente gestibile.",
+    immagine: "/images/balsamo_1080x1080.webp",
+    link: "https://laragazzariccia.com/products/balsamo-riccia",
   },
   {
     nome: "Kit Ricci Perfetti",

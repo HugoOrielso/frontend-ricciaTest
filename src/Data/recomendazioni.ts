@@ -63,52 +63,56 @@ function getStyling(values: FormValues): string | undefined {
   return stylingConVolume ? "Kit Volume WOW" : undefined
 }
 
-function getTrattamento(values: FormValues): string {
-  const capelliFini = values.spessoreDensita === "fini"
-  const capelliGrossi = values.spessoreDensita === "spessi"
+type Trattamento = { prodotti: string[]; consiglio: string }
 
-  const stsChimico = values.sts.includes("colore-decolorazione-stiraggio")
-  const stsFarmaci = values.sts.includes("terapie-farmaci")
-  const stsMeccanico = values.sts.includes("cuffie-casco-legati")
-  const stsNessuno = values.sts.includes("nessuna")
+const KIT_RECOVERY = "Kit Recovery – Balsamo + Booster Lipidico"
 
-  const lavaggioDistante = values.guidaLavaggio === "massimo-una-volta"
-
-  if (values.spessoreDensita === "spessi" && stsNessuno) {
-    return "Trattamento Riparazione Lipidica"
+function getTrattamento(values: FormValues): Trattamento {
+  const chiave = `${values.spessoreDensita}|${values.personalitaRicci}`
+  const trattamenti: Record<string, Trattamento> = {
+    "fini|ricci-s": {
+      prodotti: ["Riparazione Proteica"],
+      consiglio: "I tuoi ricci hanno bisogno di più struttura per mantenere volume e definizione nel tempo. Per questo ti consiglio la Riparazione Proteica, che aiuta a dare sostegno al capello senza appesantirlo. A maggior ragione se hai decolorato i capelli o hai notato dei cambiamenti negli ultimi 6 mesi: in questa fase un aiuto in più può fare davvero la differenza sulla tenuta dello styling.",
+    },
+    "fini|onde": {
+      prodotti: ["Riparazione Proteica"],
+      consiglio: "Quando il capello è sottile può perdere facilmente sostegno, anche quando i capelli sono tanti. La Riparazione Proteica aiuta a rinforzarne la struttura, migliorando elasticità, definizione e durata dello styling. Te la consiglio ancora di più se hai fatto una decolorazione o se negli ultimi 6 mesi hai visto cambiare i tuoi ricci.",
+    },
+    "fini|ricci-spirale": {
+      prodotti: ["Riparazione Proteica"],
+      consiglio: "Se i tuoi ricci sono morbidi ma fanno fatica a mantenere forma e definizione, potrebbe mancare un po’ di struttura. Qui entra in gioco la Riparazione Proteica: aiuta a dare più forza e sostegno al capello, senza caricarlo di prodotti pesanti. Se poi hai decolorato o i tuoi capelli sono cambiati negli ultimi 6 mesi, questo trattamento diventa ancora più importante nella tua routine.",
+    },
+    "fini|ricci-ribelli": {
+      prodotti: [KIT_RECOVERY],
+      consiglio: "Anche un capello sottile può avere bisogno di una parte più lipidica, soprattutto quando appare secco, crespo o poco luminoso. Il Kit Recovery con Balsamo + Olio ti permette di lavorare su questa esigenza prima ancora del lavaggio: applicalo da asciutto come pre-shampoo e lascialo agire non più di un’ora. In questo modo aiuti i ricci a ritrovare morbidezza ed elasticità, mantenendo però quella leggerezza di cui hanno bisogno.",
+    },
+    "fini|ricci-stretti-afro": {
+      prodotti: [KIT_RECOVERY],
+      consiglio: "I tuoi ricci tendono a essere secchi e a perdere facilmente morbidezza, hanno bisogno di aiuto per trattenere meglio l’idratazione. Per questo ti consiglio il Kit Recovery con Balsamo + Olio, da usare come impacco pre-shampoo, meglio sui capelli asciutti. Nel tuo caso non serve esagerare: lascialo in posa massimo un’ora, così dai morbidezza e luminosità senza rischiare di appesantire i tuoi capelli sottili.",
+    },
+    "spessi|ricci-s": {
+      prodotti: ["Riparazione Proteica", "Balsamo Riccia"],
+      consiglio: "I tuoi ricci hanno bisogno di più struttura per mantenere meglio forma, volume e definizione. Per questo ti consiglio la Riparazione Proteica, soprattutto se hai decolorato o hai notato dei cambiamenti nei tuoi capelli negli ultimi 6 mesi. Dopo aver risciacquato il trattamento, applica un po’ di Balsamo sulle lunghezze e risciacqua subito: non serve lasciarlo in posa, ci serve semplicemente per ridare morbidezza al capello dopo le proteine. Così lavoriamo sulla struttura senza rinunciare a morbidezza ed elasticità.",
+    },
+    "spessi|onde": {
+      prodotti: ["Riparazione Proteica", "Balsamo Riccia"],
+      consiglio: "Quando il capello è sottile può perdere facilmente sostegno, anche quando i capelli sono tanti. La Riparazione Proteica aiuta a dare più struttura, migliorando elasticità, definizione e durata dello styling. Te la consiglio ancora di più se hai decolorato o se negli ultimi 6 mesi hai visto cambiare i tuoi ricci. Dopo aver risciacquato le proteine, applica un po’ di Balsamo sulle lunghezze e risciacqua subito, senza lasciarlo in posa: ci serve semplicemente per restituire morbidezza al capello. Così lavoriamo sulla struttura, mantenendo i ricci morbidi, elastici e leggeri.",
+    },
+    "spessi|ricci-spirale": {
+      prodotti: ["Riparazione Proteica", "Balsamo Riccia"],
+      consiglio: "Se i tuoi ricci sono morbidi ma fanno fatica a mantenere forma e definizione, potrebbe mancare un po’ di struttura. Qui entra in gioco la Riparazione Proteica, che aiuta a dare più forza e sostegno al capello senza appesantirlo. A maggior ragione se hai decolorato o hai notato dei cambiamenti negli ultimi 6 mesi. Dopo aver risciacquato il trattamento, applica un po’ di Balsamo sulle lunghezze e risciacqua subito, senza lasciarlo in posa: ci serve solo per restituire morbidezza dopo le proteine. Così aiutiamo i ricci a ritrovare struttura, morbidezza e una definizione che dura più a lungo.",
+    },
+    "spessi|ricci-ribelli": {
+      prodotti: [KIT_RECOVERY],
+      consiglio: "Anche un capello sottile può avere bisogno di una parte più lipidica, soprattutto quando appare secco, crespo o poco luminoso. Il Kit Recovery con Balsamo + Olio ti permette di lavorare su questa esigenza prima ancora del lavaggio. Applicalo da asciutto come pre-shampoo: puoi lasciarlo in posa per un’ora oppure, quando vuoi concedere ai tuoi ricci un trattamento più lungo, tenerlo tutta la notte come impacco notturno. Al lavaggio successivo risciacqua bene e procedi con lo shampoo: aiuterai i ricci a ritrovare morbidezza, elasticità e luminosità.",
+    },
+    "spessi|ricci-stretti-afro": {
+      prodotti: [KIT_RECOVERY],
+      consiglio: "I tuoi ricci tendono a essere secchi e a perdere facilmente morbidezza, quindi hanno bisogno di una mano per trattenere meglio l’idratazione. Per questo ti consiglio il Kit Recovery con Balsamo + Olio, da applicare sui capelli asciutti prima dello shampoo. Puoi lasciarlo agire per un’ora oppure, quando vuoi fare un trattamento più lungo, tenerlo tutta la notte come impacco notturno. Al lavaggio successivo risciacqua bene e procedi con lo shampoo: aiuterai i ricci a ritrovare morbidezza, elasticità e luminosità.",
+    },
   }
 
-  if (capelliFini) {
-    return "Riparazione Proteica"
-  }
-
-  if (capelliGrossi) {
-    if (stsNessuno && lavaggioDistante) return "Trattamento Idratante"
-    if (stsNessuno) return "Kit Trattamenti"
-
-    if (lavaggioDistante) return "Kit Idratazione profonda"
-    return "Kit Trattamenti"
-  }
-
-  if (stsChimico) return "Riparazione Proteica"
-  if (stsFarmaci || stsMeccanico) return "Kit Riparazione"
-
-  return "Kit Idratazione profonda"
-}
-
-function getConsiglioTrattamento(values: FormValues): string | undefined {
-  const { spessoreDensita, sts } = values
-  if (spessoreDensita === "spessi" && sts.includes("nessuna")) {
-    return "Quando i ricci tendono a essere più corposi, hanno bisogno di mantenere il giusto equilibrio tra forza e idratazione. Ti consiglio di alternare un impacco pre-shampoo con balsamo e qualche goccia di olio, in questo modo i ricci rimarranno più morbidi, elastici e luminosi, senza perdere definizione."
-  }
-  if (spessoreDensita === "fini" && sts.includes("colore-decolorazione-stiraggio")) {
-    return "I tuoi ricci hanno bisogno di più struttura per mantenere volume e definizione nel tempo. Per questo ti consiglio un trattamento proteico: aiuta a rinforzare il capello senza appesantirlo, così lo styling dura più a lungo e i ricci risultano più corposi e resistenti."
-  }
-  if (spessoreDensita === "fini" && sts.includes("nessuna")) {
-    return "Anche quando i capelli sono numerosi, se la fibra è sottile può perdere facilmente sostegno. Un trattamento proteico aiuta a rinforzare la struttura del capello, migliorando la tenuta dello styling e lasciando i ricci più definiti e voluminosi."
-  }
-
-  return undefined
+  return trattamenti[chiave] ?? trattamenti["fini|onde"]
 }
 
 function getConsiglioSTS(values: FormValues): string | undefined {
@@ -222,17 +226,17 @@ export function generaRutina(values: FormValues): {
   const lavaggio = getLavaggio(values)
   const styling = getStyling(values)
   const trattamento = getTrattamento(values)
-  const consiglio = getConsiglioTrattamento(values)
+  const consiglio = trattamento.consiglio
   const consiglioStyling = getConsiglioStyling(values)
   const consiglioLavaggio = getConsiglioLavaggio(values)
   const consiglioSTS = getConsiglioSTS(values)
 
-  addUnique(prodotti, lavaggio.prodotto, styling, trattamento)
+  addUnique(prodotti, lavaggio.prodotto, styling, ...trattamento.prodotti)
 
   const passi = [
     `Lavaggio: ${lavaggio.testo}`,
     styling ? `Styling: ${styling}` : undefined,
-    `Trattamento: ${trattamento}`,
+    `Trattamento: ${trattamento.prodotti.join(" + ")}`,
   ].filter((passo): passo is string => Boolean(passo))
 
   const testo =
