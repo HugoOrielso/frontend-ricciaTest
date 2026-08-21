@@ -88,6 +88,7 @@ const buildQuizAnswers = (values: FormValues) =>
 
 const TestForm = () => {
     const API_URL = import.meta.env.VITE_API_URL
+    const PAGEVIEW_URL = API_URL.replace(/\/subscribe\/?$/, "/pageview")
     const [quizSessionId] = useState(() => {
         const storageKey = "riccia_quiz_session_id"
         try {
@@ -139,6 +140,19 @@ const TestForm = () => {
             image.src = src
         })
     }, [])
+
+    useEffect(() => {
+        void fetch(PAGEVIEW_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                sourceUrl: document.referrer || window.location.href,
+            }),
+            keepalive: true,
+        }).catch(error => {
+            console.warn("PageView tracking failed", error)
+        })
+    }, [PAGEVIEW_URL])
 
     useEffect(() => {
         const sendHeight = () => {
