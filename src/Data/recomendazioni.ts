@@ -56,11 +56,54 @@ function getLavaggio(values: FormValues): { prodotto: string; testo: string } {
   return { prodotto, testo: prodotto }
 }
 
-function getStyling(values: FormValues): string | undefined {
-  const stylingConVolume =
-    values.spessoreDensita === "fini"
+type Styling = { prodotto: string; consiglio: string }
 
-  return stylingConVolume ? "Kit Volume WOW" : undefined
+function getStyling(values: FormValues): Styling {
+  const chiave = `${values.spessoreDensita}|${values.personalitaRicci}`
+  const styling: Record<string, Styling> = {
+    "fini|onde": {
+      prodotto: "Kit Volume WOW",
+      consiglio: "Con i tuoi ricci la parola d’ordine è leggerezza: non serve abbondare con i prodotti per ottenere più definizione, perché rischieresti di togliere proprio quel volume che vogliamo valorizzare. Per questo ti consiglio il Kit Volume. Spruzza il Leave-in, modella i ricci con le mani o con la spazzola e, alla fine, applica il gel facendo scrunch. Pochi prodotti, usati nel modo giusto, ti aiuteranno ad avere ricci definiti, ariosi e con più volume.",
+    },
+    "fini|ricci-spirale": {
+      prodotto: "Kit Volume WOW",
+      consiglio: "Con i tuoi ricci la quantità e la distribuzione del prodotto fanno davvero la differenza. Una struttura più corposa ha bisogno del giusto condizionamento per rimanere morbida e facile da modellare. Per questo ti consiglio il Kit Volume insieme alla tua crema styling preferita: spruzza il Leave-in, applica la crema dividendo i capelli in sezioni e aggiungi acqua quando serve. Poi modella i ricci con le mani o la spazzola e applica il gel per fissare la forma. Così avrai più controllo, morbidezza e definizione, facendo durare lo styling più a lungo.",
+    },
+    "fini|ricci-s": {
+      prodotto: "Kit Volume WOW",
+      consiglio: "Con i tuoi ricci la quantità e la distribuzione del prodotto fanno davvero la differenza. Una struttura più corposa ha bisogno del giusto condizionamento per rimanere morbida e facile da modellare. Per questo ti consiglio il Kit Volume insieme alla tua crema styling preferita: spruzza il Leave-in, applica la crema dividendo i capelli in sezioni e aggiungi acqua quando serve. Poi modella i ricci con le mani o la spazzola e applica il gel per fissare la forma. Così avrai più controllo, morbidezza e definizione, facendo durare lo styling più a lungo.",
+    },
+    "fini|ricci-stretti-afro": {
+      prodotto: "Styling Gel",
+      consiglio: "Con i tuoi ricci distribuire bene il prodotto fa davvero la differenza: quando i capelli sono tanti, è facile che alcune ciocche ne ricevano troppo e altre quasi niente. Dividili in 3 grandi sezioni e applica la tua crema styling una sezione alla volta, aggiungendo acqua quando serve. Poi modella con le mani e applica il gel su ciocche più piccole facendo raking. Termina con lo scrunch inverso per limitare il restringimento. Qualche minuto in più nello styling ti aiuterà ad avere ricci più uniformi, definiti e facili da gestire.",
+    },
+    "fini|ricci-ribelli": {
+      prodotto: "Styling Gel",
+      consiglio: "Qui il segreto non è usare più prodotto, ma farlo arrivare bene su tutti i ricci. Con una chioma così corposa, lavorare tutto insieme rischia di lasciarti alcune zone meno definite. Dividi i capelli in 3 grandi sezioni, applica la tua crema styling e aggiungi un po’ d’acqua quando senti che serve. Poi modella i ricci e distribuisci il gel su ciocche più piccole aiutandoti con la spazzola. Alla fine fai lo scrunch inverso per contrastare il restringimento. Così avrai più controllo, una definizione più omogenea e ricci meglio distribuiti su tutta la chioma.",
+    },
+    "spessi|ricci-spirale": {
+      prodotto: "Styling Gel",
+      consiglio: "Con una chioma corposa, la differenza la fa soprattutto come distribuisci i prodotti. Se lavori tutti i capelli insieme, è facile ritrovarti con alcune zone super definite e altre un po’ meno. Dividi i capelli in 3 grandi sezioni, applica la tua crema styling e aggiungi acqua quando serve. Poi lavora su ciocche più piccole, distribuisci bene il gel aiutandoti con la spazzola e termina con lo scrunch inverso per limitare il restringimento. Così avrai più controllo, ricci definiti in modo uniforme e uno styling molto più ordinato.",
+    },
+    "spessi|ricci-ribelli": {
+      prodotto: "Styling Gel",
+      consiglio: "Con una chioma corposa, la differenza la fa soprattutto come distribuisci i prodotti. Se lavori tutti i capelli insieme, è facile ritrovarti con alcune zone super definite e altre un po’ meno. Dividi i capelli in 3 grandi sezioni, applica la tua crema styling e aggiungi acqua quando serve. Poi lavora su ciocche più piccole, distribuisci bene il gel aiutandoti con la spazzola e termina con lo scrunch inverso per limitare il restringimento. Così avrai più controllo, ricci definiti in modo uniforme e uno styling molto più ordinato.",
+    },
+    "spessi|onde": {
+      prodotto: "Kit Volume WOW",
+      consiglio: "Se i tuoi ricci ti sembrano difficili da gestire, il problema spesso non è il prodotto, ma come lo applichi. Lavora i capelli per sezioni, minimo 3, e applica prima la tua crema styling preferita, modellando bene ogni parte e spruzzando acqua quando serve. Poi applica il gel sempre per sezioni se vuoi controllare il crespo. Così avrai molto più controllo durante lo styling e una definizione più omogenea, con un volume che arriva gradualmente.",
+    },
+    "spessi|ricci-s": {
+      prodotto: "Kit Volume WOW",
+      consiglio: "Se i tuoi ricci ti sembrano difficili da gestire, il problema spesso non è il prodotto, ma come lo applichi. Lavora i capelli per sezioni, minimo 3, e applica prima la tua crema styling preferita, modellando bene ogni parte e spruzzando acqua quando serve. Poi applica il gel sempre per sezioni se vuoi controllare il crespo. Così avrai molto più controllo durante lo styling e una definizione più omogenea, con un volume che arriva gradualmente.",
+    },
+    "spessi|ricci-stretti-afro": {
+      prodotto: "Styling Gel",
+      consiglio: "Per i tuoi ricci lavorare per sezioni ti cambia davvero lo styling. Hai tanti capelli e il prodotto deve arrivare bene ovunque, soprattutto nelle zone più interne. Dividi la chioma in 3 grandi sezioni, applica la tua crema styling una sezione alla volta e aggiungi acqua quando senti che serve. Poi passa a ciocche più piccole, modella con le mani e distribuisci il gel facendo raking. Alla fine fai lo scrunch inverso per aiutarti a controllare il restringimento. Così sarà più semplice ottenere ricci ben modellati, uniformi e definiti dalla radice alle punte.",
+    },
+  }
+
+  return styling[chiave]
 }
 
 type Trattamento = { prodotti: string[]; consiglio: string }
@@ -115,7 +158,7 @@ function getTrattamento(values: FormValues): Trattamento {
   return trattamenti[chiave] ?? trattamenti["fini|onde"]
 }
 
-function getConsiglioSTS(values: FormValues): string | undefined {
+function getConsiglioSTS(values: FormValues): string[] {
   const consigli: Record<string, string> = {
     "colore-decolorazione-stiraggio":
       "Se hai colorato o decolorato i capelli, è normale che in questo periodo i tuoi ricci si comportino in modo diverso. Non significa che resteranno così per sempre. Adatta la routine a quello che stanno vivendo oggi e inizia dalla routine che ti ho appena consigliato.",
@@ -133,16 +176,7 @@ function getConsiglioSTS(values: FormValues): string | undefined {
     .map(value => consigli[value])
     .filter((consiglio): consiglio is string => Boolean(consiglio))
 
-  return selezionati.length
-    ? selezionati.map((consiglio, index) => `${index + 1}. ${consiglio}`).join("\n\n")
-    : undefined
-}
-
-function getConsiglioStyling(values: FormValues): string | undefined {
-  const { spessoreDensita } = values
-  return spessoreDensita === "fini"
-    ? "I capelli fini si appesantiscono facilmente e perdono volume velocemente. Scegli prodotti styling leggeri, come leave-in spray e gel, e applicali in piccole quantità."
-    : "I capelli spessi hanno bisogno di prodotti più corposi. Applica la crema dividendo i capelli in 3 grandi sezioni e completa lo styling con il gel."
+  return selezionati
 }
 
 function getConsiglioLavaggio(values: FormValues): string | undefined {
@@ -219,7 +253,7 @@ export function generaRutina(values: FormValues): {
   consiglio?: string
   consiglioStyling?: string
   consiglioLavaggio?: string
-  consiglioSTS?: string
+  consiglioSTS: string[]
 } {
   const prodotti: Prodotto[] = []
 
@@ -227,15 +261,15 @@ export function generaRutina(values: FormValues): {
   const styling = getStyling(values)
   const trattamento = getTrattamento(values)
   const consiglio = trattamento.consiglio
-  const consiglioStyling = getConsiglioStyling(values)
+  const consiglioStyling = styling.consiglio
   const consiglioLavaggio = getConsiglioLavaggio(values)
   const consiglioSTS = getConsiglioSTS(values)
 
-  addUnique(prodotti, lavaggio.prodotto, styling, ...trattamento.prodotti)
+  addUnique(prodotti, lavaggio.prodotto, styling.prodotto, ...trattamento.prodotti)
 
   const passi = [
     `Lavaggio: ${lavaggio.testo}`,
-    styling ? `Styling: ${styling}` : undefined,
+    `Styling: ${styling.prodotto}`,
     `Trattamento: ${trattamento.prodotti.join(" + ")}`,
   ].filter((passo): passo is string => Boolean(passo))
 

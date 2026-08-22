@@ -36,6 +36,12 @@ export const prodottiDisponibili = [
     link: "https://laragazzariccia.com/products/kit-volume",
   },
   {
+    nome: "Styling Gel",
+    descrizione: "Gel styling studiato per aiutare il riccio a mantenere forma, definizione ed elasticità più a lungo. Protegge la fibra da umidità, calore, sole e stress ambientali, contrastando crespo e perdita di tenuta.",
+    immagine: "https://laragazzariccia.com/cdn/shop/files/styling_gel_2_86b178a7-9886-40b9-9158-ea4097360b3c_1080x1080.webp?v=1757079106",
+    link: "https://laragazzariccia.com/products/stling-gel",
+  },
+  {
     nome: "Kit Riparazione",
     descrizione: "Un duo essenziale per ricci che hanno bisogno di forza e idratazione: trattamento intensivo alle proteine per rinforzare la struttura del capello e trattamento idratante solido per ripristinare morbidezza ed elasticità.",
     immagine: "https://laragazzariccia.com/cdn/shop/files/KitRistrutturare_1_1080x1080.png",

@@ -238,7 +238,7 @@ const TestForm = () => {
                     ...(consiglioTrattamento && { consiglio: consiglioTrattamento }),
                     ...(notaStyling && { consiglioStyling: notaStyling }),
                     ...(notaLavaggio && { consiglioLavaggio: notaLavaggio }),
-                    ...(consiglioSTS && { consiglioSTS }),
+                    ...(consiglioSTS.length > 0 && { consiglioSTS }),
                     prodotti: prodotti.map(p => ({
                         nome: p.nome,
                         descrizione: p.descrizione,
