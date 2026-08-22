@@ -147,7 +147,7 @@ function getTrattamento(values: FormValues): Trattamento {
     },
     "spessi|ricci-ribelli": {
       prodotti: [KIT_RECOVERY],
-      consiglio: "Anche un capello sottile può avere bisogno di una parte più lipidica, soprattutto quando appare secco, crespo o poco luminoso. Il Kit Recovery con Balsamo + Olio ti permette di lavorare su questa esigenza prima ancora del lavaggio. Applicalo da asciutto come pre-shampoo: puoi lasciarlo in posa per un’ora oppure, quando vuoi concedere ai tuoi ricci un trattamento più lungo, tenerlo tutta la notte come impacco notturno. Al lavaggio successivo risciacqua bene e procedi con lo shampoo: aiuterai i ricci a ritrovare morbidezza, elasticità e luminosità.",
+      consiglio: "Quando il capello è spesso e irregolare, può apparire più ruvido, secco e perdere facilmente morbidezza e luminosità. Il Kit Recovery con Balsamo + Olio ti aiuta a lavorare proprio su questo, dando ai ricci quella parte lipidica che li rende più morbidi e facili da gestire. Applicalo da asciutto come pre-shampoo: puoi lasciarlo in posa per un’ora oppure tutta la notte come impacco notturno. Al lavaggio successivo risciacqua bene e procedi con lo shampoo: con costanza noterai ricci più morbidi, elastici e luminosi, anche nelle zone più difficili da gestire.",
     },
     "spessi|ricci-stretti-afro": {
       prodotti: [KIT_RECOVERY],
