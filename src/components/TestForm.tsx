@@ -34,6 +34,66 @@ const OPTION_ICONS: Record<Exclude<DomandaID, "personalitaRicci">, LucideIcon[]>
 
 const cleanQuestionTitle = (title: string) => title.replace(/^\d+\.\s*/, "")
 
+type CampaignParams = {
+    utmSource: string
+    utmContent: string
+    utmCampaign: string
+}
+
+const CAMPAIGN_STORAGE_KEY = "riccia_quiz_campaign"
+
+const readCampaignUrl = (value: string): Partial<CampaignParams> => {
+    if (!value) return {}
+    try {
+        const params = new URL(value).searchParams
+        return {
+            utmSource: params.get("utm_source") || "",
+            utmContent: params.get("utm_content") || "",
+            utmCampaign: params.get("utm_campaign") || "",
+        }
+    } catch {
+        return {}
+    }
+}
+
+const saveCampaignParams = (campaign: CampaignParams) => {
+    try {
+        sessionStorage.setItem(CAMPAIGN_STORAGE_KEY, JSON.stringify(campaign))
+    } catch {
+        // Tracking must never prevent the quiz from loading.
+    }
+}
+
+const getCampaignParams = () => {
+    const campaign: CampaignParams = {
+        utmSource: "",
+        utmContent: "",
+        utmCampaign: "",
+    }
+
+    const mergeUrl = (value: string) => {
+        const parsed = readCampaignUrl(value)
+        campaign.utmSource ||= parsed.utmSource || ""
+        campaign.utmContent ||= parsed.utmContent || ""
+        campaign.utmCampaign ||= parsed.utmCampaign || ""
+    }
+
+    mergeUrl(window.location.href)
+    mergeUrl(document.referrer)
+
+    try {
+        const stored = JSON.parse(sessionStorage.getItem(CAMPAIGN_STORAGE_KEY) || "{}")
+        campaign.utmSource ||= stored.utmSource || ""
+        campaign.utmContent ||= stored.utmContent || ""
+        campaign.utmCampaign ||= stored.utmCampaign || ""
+        saveCampaignParams(campaign)
+    } catch {
+        // Tracking must never prevent the quiz from loading.
+    }
+
+    return campaign
+}
+
 const CURL_IMAGES: Record<string, string[]> = {
     "onde": [
         "/images/kindAir/Onde%20morbide%201.webp",
@@ -101,6 +161,7 @@ const TestForm = () => {
             return crypto.randomUUID()
         }
     })
+    const [campaignParams, setCampaignParams] = useState(getCampaignParams)
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
     const [reply, setReply] = useState<string>("")
     const [prodottiTrovati, setProdottiTrovati] = useState<Prodotti[]>([])
@@ -132,6 +193,42 @@ const TestForm = () => {
             newsletterConsent: false,
         },
     })
+
+    useEffect(() => {
+        const receiveCampaignContext = (event: MessageEvent) => {
+            let hostname = ""
+            try {
+                hostname = new URL(event.origin).hostname
+            } catch {
+                return
+            }
+
+            if (hostname !== "laragazzariccia.com" && !hostname.endsWith(".laragazzariccia.com")) return
+            if (event.data?.type !== "RICCIA_CAMPAIGN_CONTEXT") return
+
+            const fromParentUrl = readCampaignUrl(String(event.data.url || ""))
+            const incoming: CampaignParams = {
+                utmSource: String(event.data.utmSource || fromParentUrl.utmSource || ""),
+                utmContent: String(event.data.utmContent || fromParentUrl.utmContent || ""),
+                utmCampaign: String(event.data.utmCampaign || fromParentUrl.utmCampaign || ""),
+            }
+
+            setCampaignParams(current => {
+                const merged = {
+                    utmSource: incoming.utmSource || current.utmSource,
+                    utmContent: incoming.utmContent || current.utmContent,
+                    utmCampaign: incoming.utmCampaign || current.utmCampaign,
+                }
+                saveCampaignParams(merged)
+                return merged
+            })
+        }
+
+        window.addEventListener("message", receiveCampaignContext)
+        window.parent.postMessage({ type: "RICCIA_REQUEST_CAMPAIGN" }, "*")
+
+        return () => window.removeEventListener("message", receiveCampaignContext)
+    }, [])
 
     useEffect(() => {
         const curlImageUrls = [...new Set(Object.values(CURL_IMAGES).flat())]
@@ -230,6 +327,7 @@ const TestForm = () => {
                 body: JSON.stringify({
                     sessionId: quizSessionId,
                     sourceUrl: document.referrer || window.location.href,
+                    ...campaignParams,
                     email: values.email,
                     name: values.nome,
                     newsletterConsent: values.newsletterConsent,
