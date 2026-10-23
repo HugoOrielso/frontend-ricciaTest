@@ -29,135 +29,136 @@ function addUnique(arr: Prodotto[], ...nomi: Array<string | undefined>) {
 }
 
 function getLavaggio(values: FormValues): { prodotto: string; testo: string } {
-  const lavaggioDistante =
-    values.guidaLavaggio === "dopo-4-5-giorni" ||
-    values.guidaLavaggio === "una-settimana"
-
-  if (lavaggioDistante) {
-    return {
-      prodotto: "Kit Ricci Perfetti",
-      testo: "Lavaggio invertito con kit Ricci Perfetti",
-    }
+  const chiave = `${values.spessoreDensita}|${values.guidaLavaggio}|${values.personalitaRicci}`
+  const prodotti: Record<string, string> = {
+    "fini|massimo-una-volta|onde": "Kit Lavaggio base",
+    "fini|massimo-una-volta|ricci-spirale": "Kit Lavaggio base",
+    "fini|massimo-una-volta|ricci-ribelli": "Kit Lavaggio base",
+    "fini|massimo-una-volta|ricci-stretti-afro": "Kit Lavaggio base",
+    "fini|massimo-una-volta|ricci-s": "Kit Lavaggio base",
+    "fini|piu-volte|onde": "Kit Lavaggio Riccia",
+    "fini|piu-volte|ricci-spirale": "Kit Lavaggio Riccia",
+    "fini|piu-volte|ricci-ribelli": "Kit Lavaggio base",
+    "fini|piu-volte|ricci-stretti-afro": "Kit Lavaggio base",
+    "fini|piu-volte|ricci-s": "Kit Lavaggio base",
+    "spessi|massimo-una-volta|onde": "Kit Lavaggio base",
+    "spessi|massimo-una-volta|ricci-spirale": "Kit Lavaggio base",
+    "spessi|massimo-una-volta|ricci-ribelli": "Kit Ricci Perfetti",
+    "spessi|massimo-una-volta|ricci-stretti-afro": "Kit Ricci Perfetti",
+    "spessi|massimo-una-volta|ricci-s": "Kit Lavaggio base",
+    "spessi|piu-volte|onde": "Kit Lavaggio Riccia",
+    "spessi|piu-volte|ricci-spirale": "Kit Lavaggio Riccia",
+    "spessi|piu-volte|ricci-ribelli": "Kit Ricci Perfetti",
+    "spessi|piu-volte|ricci-stretti-afro": "Kit Ricci Perfetti",
+    "spessi|piu-volte|ricci-s": "Kit Lavaggio base",
   }
-
-  return {
-    prodotto: "Lavaggio invertito + scrub",
-    testo: "Lavaggio invertito con Kit Lavaggio Riccia + scrub",
-  }
+  const prodotto = prodotti[chiave] ?? "Kit Lavaggio base"
+  return { prodotto, testo: prodotto }
 }
 
-function getStyling(values: FormValues): string | undefined {
-  const stylingConVolume =
-    values.spessoreDensita === "fini-pochi" ||
-    values.spessoreDensita === "fini-tanti" ||
-    values.spessoreDensita === "medi-normali"
+type Styling = { prodotto: string; consiglio: string }
 
-  return stylingConVolume ? "Kit Volume WOW" : undefined
+function getStyling(values: FormValues): Styling {
+  const chiave = `${values.spessoreDensita}|${values.personalitaRicci}`
+  const styling: Record<string, Styling> = {
+    "fini|onde": {
+      prodotto: "Kit Volume WOW",
+      consiglio: "Con i tuoi ricci la parola d’ordine è leggerezza: non serve abbondare con i prodotti per ottenere più definizione, perché rischieresti di togliere proprio quel volume che vogliamo valorizzare. Per questo ti consiglio il Kit Volume. Spruzza il Leave-in, modella i ricci con le mani o con la spazzola e, alla fine, applica il gel facendo scrunch. Pochi prodotti, usati nel modo giusto, ti aiuteranno ad avere ricci definiti, ariosi e con più volume.",
+    },
+    "fini|ricci-spirale": {
+      prodotto: "Kit Volume WOW",
+      consiglio: "Con i tuoi ricci la quantità e la distribuzione del prodotto fanno davvero la differenza. Una struttura più corposa ha bisogno del giusto condizionamento per rimanere morbida e facile da modellare. Per questo ti consiglio il Kit Volume insieme alla tua crema styling preferita: spruzza il Leave-in, applica la crema dividendo i capelli in sezioni e aggiungi acqua quando serve. Poi modella i ricci con le mani o la spazzola e applica il gel per fissare la forma. Così avrai più controllo, morbidezza e definizione, facendo durare lo styling più a lungo.",
+    },
+    "fini|ricci-s": {
+      prodotto: "Kit Volume WOW",
+      consiglio: "Con i tuoi ricci la quantità e la distribuzione del prodotto fanno davvero la differenza. Una struttura più corposa ha bisogno del giusto condizionamento per rimanere morbida e facile da modellare. Per questo ti consiglio il Kit Volume insieme alla tua crema styling preferita: spruzza il Leave-in, applica la crema dividendo i capelli in sezioni e aggiungi acqua quando serve. Poi modella i ricci con le mani o la spazzola e applica il gel per fissare la forma. Così avrai più controllo, morbidezza e definizione, facendo durare lo styling più a lungo.",
+    },
+    "fini|ricci-stretti-afro": {
+      prodotto: "Styling Gel",
+      consiglio: "Con i tuoi ricci distribuire bene il prodotto fa davvero la differenza: quando i capelli sono tanti, è facile che alcune ciocche ne ricevano troppo e altre quasi niente. Dividili in 3 grandi sezioni e applica la tua crema styling una sezione alla volta, aggiungendo acqua quando serve. Poi modella con le mani e applica il gel su ciocche più piccole facendo raking. Termina con lo scrunch inverso per limitare il restringimento. Qualche minuto in più nello styling ti aiuterà ad avere ricci più uniformi, definiti e facili da gestire.",
+    },
+    "fini|ricci-ribelli": {
+      prodotto: "Styling Gel",
+      consiglio: "Qui il segreto non è usare più prodotto, ma farlo arrivare bene su tutti i ricci. Con una chioma così corposa, lavorare tutto insieme rischia di lasciarti alcune zone meno definite. Dividi i capelli in 3 grandi sezioni, applica la tua crema styling e aggiungi un po’ d’acqua quando senti che serve. Poi modella i ricci e distribuisci il gel su ciocche più piccole aiutandoti con la spazzola. Alla fine fai lo scrunch inverso per contrastare il restringimento. Così avrai più controllo, una definizione più omogenea e ricci meglio distribuiti su tutta la chioma.",
+    },
+    "spessi|ricci-spirale": {
+      prodotto: "Styling Gel",
+      consiglio: "Con una chioma corposa, la differenza la fa soprattutto come distribuisci i prodotti. Se lavori tutti i capelli insieme, è facile ritrovarti con alcune zone super definite e altre un po’ meno. Dividi i capelli in 3 grandi sezioni, applica la tua crema styling e aggiungi acqua quando serve. Poi lavora su ciocche più piccole, distribuisci bene il gel aiutandoti con la spazzola e termina con lo scrunch inverso per limitare il restringimento. Così avrai più controllo, ricci definiti in modo uniforme e uno styling molto più ordinato.",
+    },
+    "spessi|ricci-ribelli": {
+      prodotto: "Styling Gel",
+      consiglio: "Con una chioma corposa, la differenza la fa soprattutto come distribuisci i prodotti. Se lavori tutti i capelli insieme, è facile ritrovarti con alcune zone super definite e altre un po’ meno. Dividi i capelli in 3 grandi sezioni, applica la tua crema styling e aggiungi acqua quando serve. Poi lavora su ciocche più piccole, distribuisci bene il gel aiutandoti con la spazzola e termina con lo scrunch inverso per limitare il restringimento. Così avrai più controllo, ricci definiti in modo uniforme e uno styling molto più ordinato.",
+    },
+    "spessi|onde": {
+      prodotto: "Kit Volume WOW",
+      consiglio: "Se i tuoi ricci ti sembrano difficili da gestire, il problema spesso non è il prodotto, ma come lo applichi. Lavora i capelli per sezioni, minimo 3, e applica prima la tua crema styling preferita, modellando bene ogni parte e spruzzando acqua quando serve. Poi applica il gel sempre per sezioni se vuoi controllare il crespo. Così avrai molto più controllo durante lo styling e una definizione più omogenea, con un volume che arriva gradualmente.",
+    },
+    "spessi|ricci-s": {
+      prodotto: "Kit Volume WOW",
+      consiglio: "Se i tuoi ricci ti sembrano difficili da gestire, il problema spesso non è il prodotto, ma come lo applichi. Lavora i capelli per sezioni, minimo 3, e applica prima la tua crema styling preferita, modellando bene ogni parte e spruzzando acqua quando serve. Poi applica il gel sempre per sezioni se vuoi controllare il crespo. Così avrai molto più controllo durante lo styling e una definizione più omogenea, con un volume che arriva gradualmente.",
+    },
+    "spessi|ricci-stretti-afro": {
+      prodotto: "Styling Gel",
+      consiglio: "Per i tuoi ricci lavorare per sezioni ti cambia davvero lo styling. Hai tanti capelli e il prodotto deve arrivare bene ovunque, soprattutto nelle zone più interne. Dividi la chioma in 3 grandi sezioni, applica la tua crema styling una sezione alla volta e aggiungi acqua quando senti che serve. Poi passa a ciocche più piccole, modella con le mani e distribuisci il gel facendo raking. Alla fine fai lo scrunch inverso per aiutarti a controllare il restringimento. Così sarà più semplice ottenere ricci ben modellati, uniformi e definiti dalla radice alle punte.",
+    },
+  }
+
+  return styling[chiave]
 }
 
-function getTrattamento(values: FormValues): string {
-  const capelliFini =
-    values.spessoreDensita === "fini-pochi" ||
-    values.spessoreDensita === "fini-tanti"
+type Trattamento = { prodotti: string[]; consiglio: string }
 
-  const capelliMedi = values.spessoreDensita === "medi-normali"
+const KIT_RECOVERY = "Kit Recovery – Balsamo + Booster Lipidico"
 
-  const capelliGrossi =
-    values.spessoreDensita === "grossi-voluminosi" ||
-    values.spessoreDensita === "tantissimi-difficili"
-
-  const stsChimico = values.sts.includes("colore-decolorazione-stiraggio")
-  const stsFarmaci = values.sts.includes("terapie-farmaci")
-  const stsMeccanico = values.sts.includes("cuffie-casco-legati")
-  const stsNessuno = values.sts.includes("nessuna")
-
-  const lavaggioDistante =
-    values.guidaLavaggio === "dopo-4-5-giorni" ||
-    values.guidaLavaggio === "una-settimana"
-
-  // Regole specifiche definite dalla combinazione Spessore + STS.
-  if (values.spessoreDensita === "tantissimi-difficili" && stsNessuno) {
-    return "Trattamento Riparazione Lipidica"
+function getTrattamento(values: FormValues): Trattamento {
+  const chiave = `${values.spessoreDensita}|${values.personalitaRicci}`
+  const trattamenti: Record<string, Trattamento> = {
+    "fini|ricci-s": {
+      prodotti: ["Riparazione Proteica"],
+      consiglio: "I tuoi ricci hanno bisogno di più struttura per mantenere volume e definizione nel tempo. Per questo ti consiglio la Riparazione Proteica, che aiuta a dare sostegno al capello senza appesantirlo. A maggior ragione se hai decolorato i capelli o hai notato dei cambiamenti negli ultimi 6 mesi: in questa fase un aiuto in più può fare davvero la differenza sulla tenuta dello styling.",
+    },
+    "fini|onde": {
+      prodotti: ["Riparazione Proteica"],
+      consiglio: "Quando il capello è sottile può perdere facilmente sostegno, anche quando i capelli sono tanti. La Riparazione Proteica aiuta a rinforzarne la struttura, migliorando elasticità, definizione e durata dello styling. Te la consiglio ancora di più se hai fatto una decolorazione o se negli ultimi 6 mesi hai visto cambiare i tuoi ricci.",
+    },
+    "fini|ricci-spirale": {
+      prodotti: ["Riparazione Proteica"],
+      consiglio: "Se i tuoi ricci sono morbidi ma fanno fatica a mantenere forma e definizione, potrebbe mancare un po’ di struttura. Qui entra in gioco la Riparazione Proteica: aiuta a dare più forza e sostegno al capello, senza caricarlo di prodotti pesanti. Se poi hai decolorato o i tuoi capelli sono cambiati negli ultimi 6 mesi, questo trattamento diventa ancora più importante nella tua routine.",
+    },
+    "fini|ricci-ribelli": {
+      prodotti: [KIT_RECOVERY],
+      consiglio: "Anche un capello sottile può avere bisogno di una parte più lipidica, soprattutto quando appare secco, crespo o poco luminoso. Il Kit Recovery con Balsamo + Olio ti permette di lavorare su questa esigenza prima ancora del lavaggio: applicalo da asciutto come pre-shampoo e lascialo agire non più di un’ora. In questo modo aiuti i ricci a ritrovare morbidezza ed elasticità, mantenendo però quella leggerezza di cui hanno bisogno.",
+    },
+    "fini|ricci-stretti-afro": {
+      prodotti: [KIT_RECOVERY],
+      consiglio: "I tuoi ricci tendono a essere secchi e a perdere facilmente morbidezza, hanno bisogno di aiuto per trattenere meglio l’idratazione. Per questo ti consiglio il Kit Recovery con Balsamo + Olio, da usare come impacco pre-shampoo, meglio sui capelli asciutti. Nel tuo caso non serve esagerare: lascialo in posa massimo un’ora, così dai morbidezza e luminosità senza rischiare di appesantire i tuoi capelli sottili.",
+    },
+    "spessi|ricci-s": {
+      prodotti: ["Riparazione Proteica", "Balsamo Riccia"],
+      consiglio: "I tuoi ricci hanno bisogno di più struttura per mantenere meglio forma, volume e definizione. Per questo ti consiglio la Riparazione Proteica, soprattutto se hai decolorato o hai notato dei cambiamenti nei tuoi capelli negli ultimi 6 mesi. Dopo aver risciacquato il trattamento, applica un po’ di Balsamo sulle lunghezze e risciacqua subito: non serve lasciarlo in posa, ci serve semplicemente per ridare morbidezza al capello dopo le proteine. Così lavoriamo sulla struttura senza rinunciare a morbidezza ed elasticità.",
+    },
+    "spessi|onde": {
+      prodotti: ["Riparazione Proteica", "Balsamo Riccia"],
+      consiglio: "Quando il capello è sottile può perdere facilmente sostegno, anche quando i capelli sono tanti. La Riparazione Proteica aiuta a dare più struttura, migliorando elasticità, definizione e durata dello styling. Te la consiglio ancora di più se hai decolorato o se negli ultimi 6 mesi hai visto cambiare i tuoi ricci. Dopo aver risciacquato le proteine, applica un po’ di Balsamo sulle lunghezze e risciacqua subito, senza lasciarlo in posa: ci serve semplicemente per restituire morbidezza al capello. Così lavoriamo sulla struttura, mantenendo i ricci morbidi, elastici e leggeri.",
+    },
+    "spessi|ricci-spirale": {
+      prodotti: ["Riparazione Proteica", "Balsamo Riccia"],
+      consiglio: "Se i tuoi ricci sono morbidi ma fanno fatica a mantenere forma e definizione, potrebbe mancare un po’ di struttura. Qui entra in gioco la Riparazione Proteica, che aiuta a dare più forza e sostegno al capello senza appesantirlo. A maggior ragione se hai decolorato o hai notato dei cambiamenti negli ultimi 6 mesi. Dopo aver risciacquato il trattamento, applica un po’ di Balsamo sulle lunghezze e risciacqua subito, senza lasciarlo in posa: ci serve solo per restituire morbidezza dopo le proteine. Così aiutiamo i ricci a ritrovare struttura, morbidezza e una definizione che dura più a lungo.",
+    },
+    "spessi|ricci-ribelli": {
+      prodotti: [KIT_RECOVERY],
+      consiglio: "Quando il capello è spesso e irregolare, può apparire più ruvido, secco e perdere facilmente morbidezza e luminosità. Il Kit Recovery con Balsamo + Olio ti aiuta a lavorare proprio su questo, dando ai ricci quella parte lipidica che li rende più morbidi e facili da gestire. Applicalo da asciutto come pre-shampoo: puoi lasciarlo in posa per un’ora oppure tutta la notte come impacco notturno. Al lavaggio successivo risciacqua bene e procedi con lo shampoo: con costanza noterai ricci più morbidi, elastici e luminosi, anche nelle zone più difficili da gestire.",
+    },
+    "spessi|ricci-stretti-afro": {
+      prodotti: [KIT_RECOVERY],
+      consiglio: "I tuoi ricci tendono a essere secchi e a perdere facilmente morbidezza, quindi hanno bisogno di una mano per trattenere meglio l’idratazione. Per questo ti consiglio il Kit Recovery con Balsamo + Olio, da applicare sui capelli asciutti prima dello shampoo. Puoi lasciarlo agire per un’ora oppure, quando vuoi fare un trattamento più lungo, tenerlo tutta la notte come impacco notturno. Al lavaggio successivo risciacqua bene e procedi con lo shampoo: aiuterai i ricci a ritrovare morbidezza, elasticità e luminosità.",
+    },
   }
 
-  if (values.spessoreDensita === "medi-normali" && stsChimico) {
-    return "Riparazione Proteica"
-  }
-
-  if (values.spessoreDensita === "grossi-voluminosi" && stsNessuno) {
-    return "Trattamento Riparazione Lipidica"
-  }
-
-  if (values.spessoreDensita === "fini-pochi" && stsChimico) {
-    return "Riparazione Proteica"
-  }
-
-  if (values.spessoreDensita === "fini-tanti" && stsNessuno) {
-    return "Riparazione Proteica"
-  }
-
-  if (capelliFini) {
-    return "Riparazione Proteica"
-  }
-
-  if (capelliGrossi) {
-    if (stsNessuno && lavaggioDistante) return "Trattamento Idratante"
-    if (stsNessuno) return "Kit Trattamenti"
-
-    if (values.spessoreDensita === "grossi-voluminosi") {
-      return "Kit Idratazione profonda"
-    }
-
-    if (values.spessoreDensita === "tantissimi-difficili") {
-      if (lavaggioDistante) return "Kit Idratazione profonda"
-      return "Kit Trattamenti"
-    }
-  }
-
-  if (capelliMedi) {
-    if (stsChimico) return "Kit Trattamenti"
-    return "Kit Idratazione profonda"
-  }
-
-  if (stsChimico) return "Riparazione Proteica"
-  if (stsFarmaci || stsMeccanico) return "Kit Riparazione"
-
-  return "Kit Idratazione profonda"
+  return trattamenti[chiave] ?? trattamenti["fini|onde"]
 }
 
-function getConsiglioTrattamento(values: FormValues): string | undefined {
-  const { spessoreDensita, sts } = values
-  console.log("getConsiglioTrattamento", spessoreDensita, sts)
-  if (spessoreDensita === "tantissimi-difficili" && sts.includes("nessuna")) {
-    return "Quando i ricci tendono a essere più ruvidi, rigidi o fanno fatica a trattenere l'idratazione, hanno bisogno di costanza più che di grandi quantità di prodotto. Alterna un impacco pre-shampoo con balsamo e qualche goccia di olio: aiuterai i capelli a ritrovare morbidezza, elasticità e saranno molto più facili da gestire."
-  }
-
-  if (
-    spessoreDensita === "medi-normali" &&
-    sts.includes("colore-decolorazione-stiraggio")
-  ) {
-    return "L’equilibrio dei tuoi ricci devi cercare di mantenerlo nel tempo. Un trattamento proteico periodico aiuta a rinforzare la fibra del capello, mantenendo i ricci elastici, definiti e pronti a sostenere meglio lo styling."
-  }
-
-  if (spessoreDensita === "grossi-voluminosi" && sts.includes("nessuna")) {
-    return "Quando i ricci tendono a essere più corposi, hanno bisogno di mantenere il giusto equilibrio tra forza e idratazione. Ti consiglio di alternare un impacco pre-shampoo con balsamo e qualche goccia di olio, in questo modo i ricci rimarranno più morbidi, elastici e luminosi, senza perdere definizione."
-  }
-
-  if (
-    spessoreDensita === "fini-pochi" &&
-    sts.includes("colore-decolorazione-stiraggio")
-  ) {
-    return "I tuoi ricci hanno bisogno di più struttura per mantenere volume e definizione nel tempo. Per questo ti consiglio un trattamento proteico: aiuta a rinforzare il capello senza appesantirlo, così lo styling dura più a lungo e i ricci risultano più corposi e resistenti."
-  }
-
-  if (spessoreDensita === "fini-tanti" && sts.includes("nessuna")) {
-    return "Anche quando i capelli sono numerosi, se la fibra è sottile può perdere facilmente sostegno. Un trattamento proteico aiuta a rinforzare la struttura del capello, migliorando la tenuta dello styling e lasciando i ricci più definiti e voluminosi."
-  }
-
-  return undefined
-}
-
-function getConsiglioSTS(values: FormValues): string | undefined {
+function getConsiglioSTS(values: FormValues): string[] {
   const consigli: Record<string, string> = {
     "colore-decolorazione-stiraggio":
       "Se hai colorato o decolorato i capelli, è normale che in questo periodo i tuoi ricci si comportino in modo diverso. Non significa che resteranno così per sempre. Adatta la routine a quello che stanno vivendo oggi e inizia dalla routine che ti ho appena consigliato.",
@@ -175,34 +176,29 @@ function getConsiglioSTS(values: FormValues): string | undefined {
     .map(value => consigli[value])
     .filter((consiglio): consiglio is string => Boolean(consiglio))
 
-  return selezionati.length
-    ? selezionati.map((consiglio, index) => `${index + 1}. ${consiglio}`).join("\n\n")
-    : undefined
-}
-
-function getConsiglioStyling(values: FormValues): string | undefined {
-  const { spessoreDensita } = values
-
-  if (spessoreDensita === "fini-pochi" || spessoreDensita === "fini-tanti") {
-    return "Se hai pochi capelli e sono anche fini, la tentazione è quella di usare tanto prodotto per cercare più definizione. In realtà succede l’opposto: più li appesantisci, più perdono volume. Per questo ti consiglio il Kit Volume, pensato per dare ai tuoi ricci idratazione, sostegno e definizione senza appesantirli. Con i giusti prodotti e la corretta tecnica di styling potrai ottenere ricci più pieni, ariosi e con un volume che dura più a lungo."
-  }
-
-  if (spessoreDensita === "grossi-voluminosi") {
-    return "Con tanti capelli è facilissimo che qualche ciocca rimanga senza prodotto. Per evitarlo, dividi i capelli in 3 grandi sezioni e applica la tua crema di styling preferita su una sezione alla volta. Una volta finito, modella e applica il gel facendo lo scrunch. Bastano pochi minuti in più per avere una definizione molto più uniforme."
-  }
-
-  if (spessoreDensita === "medi-normali") {
-    return "Con i tuoi ricci non serve complicare lo styling. Applica la tua crema di styling preferita in modo uniforme su tutti i capelli, modellando bene i ricci. Solo alla fine applica il gel facendo lo scrunch: ti aiuterà a mantenere la definizione più a lungo senza appesantire."
-  }
-
-  if (spessoreDensita === "tantissimi-difficili") {
-    return "Se i tuoi ricci ti sembrano difficili da gestire, il problema spesso non è il prodotto, ma come lo applichi. Lavora i capelli per sezioni, minimo 3 e applica prima la tua crema styling preferita e modella bene ogni parte, meglio per sezioni spruzzando acqua. Poi applica il gel sempre per sezioni se vuoi controllare il crespo, così avrai molto più controllo durante lo styling e una definizione più omogenea, con un volume che arriva gradualmente."
-  }
-
-  return undefined
+  return selezionati
 }
 
 function getConsiglioLavaggio(values: FormValues): string | undefined {
+  const ricciConLavaggioLeggero = ["onde", "ricci-spirale", "ricci-s"].includes(values.personalitaRicci)
+  const ricciConPiuIdratazione = ["ricci-ribelli", "ricci-stretti-afro"].includes(values.personalitaRicci)
+
+  if (ricciConLavaggioLeggero) {
+    const indicazioneSpessore = values.spessoreDensita === "fini"
+      ? "Visto che hai i capelli sottili, applica il balsamo solo prima dello shampoo e non ripeterlo dopo il risciacquo: manterrai i ricci leggeri, voluminosi e definiti."
+      : "Visto che hai i capelli spessi, distribuisci bene il balsamo sulle lunghezze e, dopo il risciacquo, applica un leave-in in crema per preparare i capelli allo styling."
+
+    return `I tuoi ricci hanno bisogno di essere lavati frequentemente. Non è un problema: significa semplicemente che la tua cute produce più sebo o accumula più facilmente sudore e prodotti. Per questo ti consigliamo un lavaggio invertito con un solo passaggio di shampoo se lavi i capelli tutti i giorni; altrimenti applica lo shampoo due volte. ${indicazioneSpessore} Per ottenere i migliori risultati, segui la modalità d’uso indicata nella scheda del prodotto in base allo spessore dei tuoi capelli. La frequenza di lavaggio non è un problema. Il segreto è come lavi i tuoi ricci.`
+  }
+
+  if (ricciConPiuIdratazione) {
+    const indicazioneSpessore = values.spessoreDensita === "fini"
+      ? "Hai i capelli sottili, quindi non utilizzare maschere o oli dopo il risciacquo."
+      : "Hai i capelli spessi: dopo il risciacquo applica un leave-in in crema per preparare i capelli allo styling."
+
+    return `I tuoi ricci mantengono la piega per diversi giorni, ma le lunghezze tendono ad aver bisogno di più idratazione. Per questo ti consigliamo il lavaggio invertito da asciutto, da ripetere dopo il primo risciacquo. ${indicazioneSpessore} Inoltre, la tua cute produce poco sebo: per questo i capelli possono apparire secchi prima ancora di sporcarsi. Ti consigliamo un lavaggio detox da asciutto ogni 15 giorni, seguito da un lavaggio invertito con due passaggi di shampoo. Per ottenere i migliori risultati, segui la modalità d’uso indicata nella scheda del prodotto in base allo spessore dei tuoi capelli. La frequenza di lavaggio non è un problema. Il segreto è come lavi i tuoi ricci.`
+  }
+
   const chiave = `${values.spessoreDensita}|${values.guidaLavaggio}`
 
   const consigli: Record<string, string> = {
@@ -257,24 +253,24 @@ export function generaRutina(values: FormValues): {
   consiglio?: string
   consiglioStyling?: string
   consiglioLavaggio?: string
-  consiglioSTS?: string
+  consiglioSTS: string[]
 } {
   const prodotti: Prodotto[] = []
 
   const lavaggio = getLavaggio(values)
   const styling = getStyling(values)
   const trattamento = getTrattamento(values)
-  const consiglio = getConsiglioTrattamento(values)
-  const consiglioStyling = getConsiglioStyling(values)
+  const consiglio = trattamento.consiglio
+  const consiglioStyling = styling.consiglio
   const consiglioLavaggio = getConsiglioLavaggio(values)
   const consiglioSTS = getConsiglioSTS(values)
 
-  addUnique(prodotti, lavaggio.prodotto, styling, trattamento)
+  addUnique(prodotti, lavaggio.prodotto, styling.prodotto, ...trattamento.prodotti)
 
   const passi = [
     `Lavaggio: ${lavaggio.testo}`,
-    styling ? `Styling: ${styling}` : undefined,
-    `Trattamento: ${trattamento}`,
+    `Styling: ${styling.prodotto}`,
+    `Trattamento: ${trattamento.prodotti.join(" + ")}`,
   ].filter((passo): passo is string => Boolean(passo))
 
   const testo =

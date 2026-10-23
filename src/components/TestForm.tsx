@@ -6,10 +6,10 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { domandeCMR, type DomandaID } from "./data"
 import { motion, AnimatePresence } from "motion/react"
 import {
-    ArrowLeft, ArrowRight, Check, Mail, MailWarningIcon, Pencil,
+    ArrowLeft, ArrowRight, Mail,
     Droplet, Droplets, CalendarDays, Sparkles, Waves, FlaskConical,
     Paintbrush, Activity, Pill, HardHat, CircleOff, Feather, Layers3,
-    CircleGauge, Cloud, Wind, Sun, Volume2, Heart, ShieldCheck, HelpCircle,
+    CircleGauge, Cloud, Sun, Volume2, Heart, ShieldCheck, HelpCircle,
     type LucideIcon,
 } from "lucide-react"
 import Reply from "./Reply"
@@ -24,36 +24,93 @@ const TEXT_SOFT = "#993556"
 const PRIVACY_URL = "https://laragazzariccia.com/pages/privacy-policy"
 
 const OPTION_ICONS: Record<Exclude<DomandaID, "personalitaRicci">, LucideIcon[]> = {
-    guidaLavaggio: [Droplet, Droplets, Waves, CalendarDays],
+    guidaLavaggio: [CalendarDays, Droplets],
     porosita: [FlaskConical, Droplets, Layers3, Sparkles],
     sts: [Paintbrush, Activity, Pill, HardHat, CircleOff],
-    spessoreDensita: [Feather, Wind, CircleGauge, Volume2, Layers3],
+    spessoreDensita: [Feather, Layers3],
     problemaPrincipale: [Cloud, Volume2, Sun, Waves, CalendarDays, Droplet, HelpCircle],
     obiettivoDesiderato: [Sparkles, Volume2, Heart, Feather, CircleGauge, ShieldCheck],
 }
 
 const cleanQuestionTitle = (title: string) => title.replace(/^\d+\.\s*/, "")
 
+type CampaignParams = {
+    utmSource: string
+    utmContent: string
+    utmCampaign: string
+}
+
+const CAMPAIGN_STORAGE_KEY = "riccia_quiz_campaign"
+
+const readCampaignUrl = (value: string): Partial<CampaignParams> => {
+    if (!value) return {}
+    try {
+        const params = new URL(value).searchParams
+        return {
+            utmSource: params.get("utm_source") || "",
+            utmContent: params.get("utm_content") || "",
+            utmCampaign: params.get("utm_campaign") || "",
+        }
+    } catch {
+        return {}
+    }
+}
+
+const saveCampaignParams = (campaign: CampaignParams) => {
+    try {
+        sessionStorage.setItem(CAMPAIGN_STORAGE_KEY, JSON.stringify(campaign))
+    } catch {
+        // Tracking must never prevent the quiz from loading.
+    }
+}
+
+const getCampaignParams = () => {
+    const campaign: CampaignParams = {
+        utmSource: "",
+        utmContent: "",
+        utmCampaign: "",
+    }
+
+    const mergeUrl = (value: string) => {
+        const parsed = readCampaignUrl(value)
+        campaign.utmSource ||= parsed.utmSource || ""
+        campaign.utmContent ||= parsed.utmContent || ""
+        campaign.utmCampaign ||= parsed.utmCampaign || ""
+    }
+
+    mergeUrl(window.location.href)
+    mergeUrl(document.referrer)
+
+    try {
+        const stored = JSON.parse(sessionStorage.getItem(CAMPAIGN_STORAGE_KEY) || "{}")
+        campaign.utmSource ||= stored.utmSource || ""
+        campaign.utmContent ||= stored.utmContent || ""
+        campaign.utmCampaign ||= stored.utmCampaign || ""
+        saveCampaignParams(campaign)
+    } catch {
+        // Tracking must never prevent the quiz from loading.
+    }
+
+    return campaign
+}
+
 const CURL_IMAGES: Record<string, string[]> = {
-    "onde-morbide": [
+    "onde": [
         "/images/kindAir/Onde%20morbide%201.webp",
-        "/images/kindAir/Onde%20morbide%202.webp",
+        "/images/kindAir/Onde%20morbide%202%20upright.webp",
     ],
-    "ricci-definiti": [
-        "/images/kindAir/Ricci%20a%20S%201.webp",
-        "/images/kindAir/Ricci%20a%20S%202.webp",
+    "ricci-spirale": [
+        "/foto%20ricci/2.png",
     ],
     "ricci-ribelli": [
         "/images/kindAir/Ricci%20irregolari%20e%20ribelli.webp",
     ],
     "ricci-stretti-afro": [
-        "/images/kindAir/Ricci%20stretti%20o%20afro%201.webp",
+        "/images/kindAir/Ricci%20stretti%20o%20afro%201%20upright.webp",
     ],
-    "mix-tutto": [
-        "/images/kindAir/Onde%20morbide%201.webp",
+    "ricci-s": [
+        "/images/kindAir/Ricci%20a%20S%201%20upright.webp",
         "/images/kindAir/Ricci%20a%20S%202.webp",
-        "/images/kindAir/Ricci%20irregolari%20e%20ribelli.webp",
-        "/images/kindAir/Ricci%20stretti%20o%20afro%201.webp",
     ],
 }
 
@@ -91,21 +148,35 @@ const buildQuizAnswers = (values: FormValues) =>
 
 const TestForm = () => {
     const API_URL = import.meta.env.VITE_API_URL
+    const PAGEVIEW_URL = API_URL.replace(/\/subscribe\/?$/, "/pageview")
+    const [quizSessionId] = useState(() => {
+        const storageKey = "riccia_quiz_session_id"
+        try {
+            const stored = localStorage.getItem(storageKey)
+            if (stored) return stored
+            const created = crypto.randomUUID()
+            localStorage.setItem(storageKey, created)
+            return created
+        } catch {
+            return crypto.randomUUID()
+        }
+    })
+    const [campaignParams, setCampaignParams] = useState(getCampaignParams)
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
     const [reply, setReply] = useState<string>("")
     const [prodottiTrovati, setProdottiTrovati] = useState<Prodotti[]>([])
     const [nomeRisultato, setNomeRisultato] = useState("")
+    const [coupon, setCoupon] = useState<{ code: string; percent: number; expiresAt: string } | null>(null)
     const [currentIndex, setCurrentIndex] = useState(0)
     const [direction, setDirection] = useState<"left" | "right">("right")
     const [formMessage, setFormMessage] = useState("")
-    const [isConfirmingLead, setIsConfirmingLead] = useState(false)
 
     const isLeadStep = currentIndex === domandeCMR.length
     const domanda = isLeadStep ? null : domandeCMR[currentIndex]
     const domandaId = domanda?.id as DomandaID | undefined
     const questionCount = domandeCMR.length
     const isFirst = currentIndex === 0
-    const isLast = isLeadStep || isConfirmingLead
+    const isLast = isLeadStep
 
     const form = useForm<FormValues>({
         resolver: zodResolver(formSchema),
@@ -124,12 +195,61 @@ const TestForm = () => {
     })
 
     useEffect(() => {
+        const receiveCampaignContext = (event: MessageEvent) => {
+            let hostname = ""
+            try {
+                hostname = new URL(event.origin).hostname
+            } catch {
+                return
+            }
+
+            if (hostname !== "laragazzariccia.com" && !hostname.endsWith(".laragazzariccia.com")) return
+            if (event.data?.type !== "RICCIA_CAMPAIGN_CONTEXT") return
+
+            const fromParentUrl = readCampaignUrl(String(event.data.url || ""))
+            const incoming: CampaignParams = {
+                utmSource: String(event.data.utmSource || fromParentUrl.utmSource || ""),
+                utmContent: String(event.data.utmContent || fromParentUrl.utmContent || ""),
+                utmCampaign: String(event.data.utmCampaign || fromParentUrl.utmCampaign || ""),
+            }
+
+            setCampaignParams(current => {
+                const merged = {
+                    utmSource: incoming.utmSource || current.utmSource,
+                    utmContent: incoming.utmContent || current.utmContent,
+                    utmCampaign: incoming.utmCampaign || current.utmCampaign,
+                }
+                saveCampaignParams(merged)
+                return merged
+            })
+        }
+
+        window.addEventListener("message", receiveCampaignContext)
+        window.parent.postMessage({ type: "RICCIA_REQUEST_CAMPAIGN" }, "*")
+
+        return () => window.removeEventListener("message", receiveCampaignContext)
+    }, [])
+
+    useEffect(() => {
         const curlImageUrls = [...new Set(Object.values(CURL_IMAGES).flat())]
         curlImageUrls.forEach(src => {
             const image = new Image()
             image.src = src
         })
     }, [])
+
+    useEffect(() => {
+        void fetch(PAGEVIEW_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                sourceUrl: document.referrer || window.location.href,
+            }),
+            keepalive: true,
+        }).catch(error => {
+            console.warn("PageView tracking failed", error)
+        })
+    }, [PAGEVIEW_URL])
 
     useEffect(() => {
         const sendHeight = () => {
@@ -157,7 +277,7 @@ const TestForm = () => {
             window.removeEventListener("load", sendHeight)
             window.removeEventListener("resize", sendHeight)
         }
-    }, [currentIndex, reply, prodottiTrovati.length, isConfirmingLead])
+    }, [currentIndex, reply, prodottiTrovati.length])
 
     const nextQuestion = async () => {
         setFormMessage("")
@@ -175,13 +295,6 @@ const TestForm = () => {
     }
 
     const prevQuestion = () => {
-        if (isConfirmingLead) {
-            setFormMessage("")
-            setDirection("left")
-            setIsConfirmingLead(false)
-            return
-        }
-
         if (!isFirst) {
             setFormMessage("")
             setDirection("left")
@@ -191,19 +304,6 @@ const TestForm = () => {
 
 
     async function onSubmit(): Promise<void> {
-        setFormMessage("")
-        setDirection("right")
-        setIsConfirmingLead(true)
-    }
-
-    async function submitConfirmed(): Promise<void> {
-        const isValid = await form.trigger(["nome", "email", "newsletterConsent"])
-        if (!isValid) {
-            setDirection("left")
-            setIsConfirmingLead(false)
-            return
-        }
-
         const values = form.getValues()
         setFormMessage("")
 
@@ -225,6 +325,9 @@ const TestForm = () => {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
+                    sessionId: quizSessionId,
+                    sourceUrl: document.referrer || window.location.href,
+                    ...campaignParams,
                     email: values.email,
                     name: values.nome,
                     newsletterConsent: values.newsletterConsent,
@@ -233,11 +336,13 @@ const TestForm = () => {
                     ...(consiglioTrattamento && { consiglio: consiglioTrattamento }),
                     ...(notaStyling && { consiglioStyling: notaStyling }),
                     ...(notaLavaggio && { consiglioLavaggio: notaLavaggio }),
-                    ...(consiglioSTS && { consiglioSTS }),
+                    ...(consiglioSTS.length > 0 && { consiglioSTS }),
                     prodotti: prodotti.map(p => ({
                         nome: p.nome,
                         descrizione: p.descrizione,
-                        immagine: p.immagine,
+                        immagine: p.immagine.startsWith("/")
+                            ? new URL(p.immagine, window.location.origin).href
+                            : p.immagine,
                         link: p.link,
                     })),
                 }),
@@ -249,9 +354,14 @@ const TestForm = () => {
                 throw new Error(data?.message || "Errore durante l'iscrizione")
             }
 
+            if (!data?.coupon?.code || !data?.coupon?.percent || !data?.coupon?.expiresAt) {
+                throw new Error("Il coupon non è stato ricevuto. Riprova.")
+            }
+
             setReply(testo)
             setProdottiTrovati(prodotti)
             setNomeRisultato(values.nome)
+            setCoupon(data.coupon)
         } catch (error) {
             setFormMessage(error instanceof Error ? error.message : "Si è verificato un errore. Riprova.")
         } finally {
@@ -259,40 +369,73 @@ const TestForm = () => {
         }
     }
 
-    const editLeadData = () => {
-        setFormMessage("")
-        setDirection("left")
-        setIsConfirmingLead(false)
-    }
-
     return (
-        <div className="min-h-screen w-full flex items-center justify-center">
-            <div className="flex flex-col gap-2">
+        <div className="min-h-screen w-full flex items-center justify-center overflow-hidden p-2">
+            <div className="relative flex w-full max-w-6xl items-center justify-center py-3 lg:min-h-180">
+                {reply.length === 0 && (
+                    <div className="pointer-events-none absolute inset-0 hidden lg:block" aria-hidden="true">
+                        <img
+                            src="/images/prodottiriccia_1080x1080.webp"
+                            alt=""
+                            className="absolute left-2 top-28 w-44 -rotate-7 rounded-3xl object-cover shadow-[0_18px_35px_rgba(75,21,40,0.16)] xl:left-8 xl:w-52"
+                        />
+                        <img
+                            src="/images/shampoo_sito_1080x1080.webp"
+                            alt=""
+                            className="absolute right-2 top-36 w-40 rotate-7 rounded-3xl object-cover shadow-[0_18px_35px_rgba(75,21,40,0.16)] xl:right-8 xl:w-48"
+                        />
+                        <div className="absolute right-0 top-24 max-w-48 -rotate-3 rounded-2xl bg-[#fbeaf0] px-5 py-3 text-left text-sm font-semibold leading-snug text-[#72243E] shadow-[0_12px_25px_rgba(75,21,40,0.12)]">
+                            Sto sfidando le aspettative, non i ricci 🩷
+                        </div>
+                        <img
+                            src="/images/balsamo_1080x1080.webp"
+                            alt=""
+                            className="absolute bottom-12 left-10 w-36 rotate-6 rounded-3xl object-cover shadow-[0_18px_35px_rgba(75,21,40,0.14)] xl:left-20 xl:w-44"
+                        />
+                        <img
+                            src="/images/ChatGPTImage23apr2026_12_33_23_1080x1080.webp"
+                            alt=""
+                            className="absolute bottom-8 right-10 w-36 -rotate-6 rounded-3xl object-cover shadow-[0_18px_35px_rgba(75,21,40,0.14)] xl:right-20 xl:w-44"
+                        />
+                        <div className="absolute bottom-5 left-6 max-w-44 rotate-2 rounded-2xl bg-[#fbeaf0] px-5 py-3 text-left text-sm font-semibold leading-snug text-[#72243E] shadow-[0_12px_25px_rgba(75,21,40,0.12)] xl:left-14">
+                            Ogni riccio ha il suo carattere.
+                        </div>
+                        <div className="absolute bottom-28 right-0 max-w-44 -rotate-3 rounded-2xl bg-[#fbeaf0] px-5 py-3 text-left text-sm font-semibold leading-snug text-[#72243E] shadow-[0_12px_25px_rgba(75,21,40,0.12)]">
+                            Effetto crespo? Noi lo chiamiamo effetto wow.
+                        </div>
+                    </div>
+                )}
+
+                <div className={`${reply.length > 0 ? "hidden" : "flex"} relative z-10 mx-auto w-full max-w-2xl flex-col items-center justify-center gap-2`}>
                 {reply.length === 0 && (
                     <form
                         onSubmit={form.handleSubmit(onSubmit)}
                         className="w-full"
                     >
-                        <div className="bg-white rounded-3xl shadow-sm" style={{ border: `1px solid ${PINK_MID}` }}>
-                            <div className="px-6 pt-6 pb-4" style={{ borderBottom: `1px solid ${PINK_LIGHT}` }}>
-                                <div className="flex items-center gap-2 mb-1">
-                                    <div className="w-7 h-7 rounded-full flex items-center justify-center" style={{ background: PINK }}>
-                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round">
-                                            <path d="M12 2a5 5 0 0 1 5 5c0 3-2 5-5 8-3-3-5-5-5-8a5 5 0 0 1 5-5z" />
-                                        </svg>
-                                    </div>
+                        <div className="relative overflow-hidden bg-white rounded-3xl shadow-sm" style={{ border: `1px solid ${PINK_MID}` }}>
+                            <img
+                                src="/images/balsamo_1080x1080.webp"
+                                alt=""
+                                aria-hidden="true"
+                                className="pointer-events-none absolute -bottom-8 -left-8 z-0 size-40 -rotate-12 rounded-3xl object-cover opacity-15 blur-[2px] lg:hidden"
+                            />
+                            {currentIndex === 0 && (
+                            <div className="relative z-10 px-5 pt-5 pb-3" style={{ borderBottom: `1px solid ${PINK_LIGHT}` }}>
+                                <div className="mb-1.5 flex flex-col items-center gap-1.5">
+
                                     <h1 className="text-base font-semibold" style={{ color: TEXT_DARK }}>
-                                        Conosco i Miei Ricci
+                                        Fai il Test: Conosco i miei ricci
                                     </h1>
                                 </div>
-                                <p style={{ color: TEXT_SOFT }}>
-                                    Compila il test e scopri i prodotti più adatti ai tuoi ricci
+                                <p className="mx-auto max-w-md text-center text-sm" style={{ color: TEXT_SOFT }}>
+                                    Non esiste una routine perfetta per tutte. Esiste quella giusta per te: scoprila ora.
                                 </p>
                             </div>
+                            )}
 
-                            <div className="flex flex-col gap-3 px-6 pt-5">
+                            <div className="relative z-10 flex flex-col gap-2.5 px-5 pt-4">
                                 <span className="text-start text-xs font-semibold uppercase tracking-wide" style={{ color: TEXT_SOFT }}>
-                                    {isConfirmingLead ? "Conferma dati" : isLeadStep ? "Invio risultato" : `Domanda ${currentIndex + 1} di ${domandeCMR.length}`}
+                                    {isLeadStep ? "Invio risultato" : `Domanda ${currentIndex + 1} di ${domandeCMR.length}`}
                                 </span>
                                 <div className="grid w-full gap-1.5" style={{ gridTemplateColumns: `repeat(${questionCount}, minmax(0, 1fr))` }} aria-label={`Progresso: ${Math.min(currentIndex + 1, questionCount)} di ${questionCount}`}>
                                     {Array.from({ length: questionCount }).map((_, i) => (
@@ -302,31 +445,31 @@ const TestForm = () => {
                                 </div>
                             </div>
 
-                            <div className="px-6 pt-4 pb-2 min-h-70">
+                            <div className="relative z-10 px-5 pt-3 pb-2 min-h-60">
                                 <AnimatePresence mode="wait">
                                     <motion.div
-                                        key={isConfirmingLead ? "confirm-lead" : currentIndex}
+                                        key={currentIndex}
                                         initial={{ opacity: 0, x: direction === "right" ? 40 : -40 }}
                                         animate={{ opacity: 1, x: 0 }}
                                         exit={{ opacity: 0, x: direction === "right" ? -40 : 40 }}
                                         transition={{ duration: 0.25, ease: "easeOut" }}
-                                        className="flex flex-col gap-4"
+                                        className="flex flex-col gap-3"
                                     >
                                         {!isLeadStep && domanda && domandaId && (
                                             <>
                                                 <div>
-                                                    <h2 className="text-center text-xl font-semibold mb-1" style={{ color: TEXT_DARK }}>
+                                                    <h2 className="text-center text-lg font-semibold mb-1" style={{ color: TEXT_DARK }}>
                                                         {domandaId === "personalitaRicci" ? domanda.titolo : cleanQuestionTitle(domanda.titolo)}
                                                     </h2>
                                                     {domanda.descrizione && (
-                                                        <p className="text-start leading-relaxed" style={{ color: TEXT_MID }}>
+                                                        <p className="text-start text-sm leading-relaxed" style={{ color: TEXT_MID }}>
                                                             {domanda.descrizione}
                                                         </p>
                                                     )}
                                                 </div>
 
                                                 {domandaId === "sts" ? (
-                                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3" role="group">
+                                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5" role="group">
                                                         {domanda.opzioni.map((opzione, optionIndex) => {
                                                             const selectedValues = form.watch("sts")
                                                             const checked = selectedValues.includes(opzione.value)
@@ -336,7 +479,7 @@ const TestForm = () => {
                                                                 <label
                                                                     key={opzione.id}
                                                                     htmlFor={opzione.id}
-                                                                    className="relative flex min-h-36 flex-col items-center justify-center gap-3 rounded-xl p-5 cursor-pointer text-center transition-all duration-150 hover:-translate-y-0.5 hover:shadow-md"
+                                                                    className="relative flex min-h-28 flex-col items-center justify-center gap-2 rounded-xl p-3.5 cursor-pointer text-center transition-all duration-150 hover:-translate-y-0.5 hover:shadow-md"
                                                                     style={{
                                                                         border: `1.5px solid ${checked ? PINK : PINK_MID}`,
                                                                         background: checked ? PINK_LIGHT : "white",
@@ -362,10 +505,10 @@ const TestForm = () => {
                                                                         className="absolute right-3 top-3 size-4 shrink-0"
                                                                         style={{ accentColor: PINK }}
                                                                     />
-                                                                    <span className="flex size-12 items-center justify-center rounded-full" style={{ background: PINK_LIGHT, color: TEXT_SOFT }}>
-                                                                        <Icon size={22} strokeWidth={1.9} />
+                                                                    <span className="flex size-10 items-center justify-center rounded-full" style={{ background: PINK_LIGHT, color: TEXT_SOFT }}>
+                                                                        <Icon size={19} strokeWidth={1.9} />
                                                                     </span>
-                                                                    <span className="max-w-112 text-sm sm:text-base leading-snug font-semibold" style={{ color: checked ? TEXT_DARK : TEXT_MID }}>
+                                                                    <span className="max-w-112 text-sm leading-snug font-semibold" style={{ color: checked ? TEXT_DARK : TEXT_MID }}>
                                                                         {opzione.label}
                                                                     </span>
                                                                 </label>
@@ -379,7 +522,7 @@ const TestForm = () => {
                                                             form.setValue(domandaId, v, { shouldValidate: true })
                                                             setFormMessage("")
                                                         }}
-                                                        className="grid grid-cols-1 sm:grid-cols-2 gap-3"
+                                                        className="grid grid-cols-1 sm:grid-cols-2 gap-2.5"
                                                     >
                                                         {domanda.opzioni.map((opzione) => {
                                                             const checked = form.watch(domandaId) === opzione.value
@@ -396,7 +539,8 @@ const TestForm = () => {
                                                                     }}
                                                                 >
                                                                     <span
-                                                                        className={`grid h-48 w-full overflow-hidden bg-pink-50 ${images.length > 2 ? "grid-cols-2 grid-rows-2" : images.length === 2 ? "grid-cols-2" : "grid-cols-1"}`}
+                                                                        className="grid aspect-square w-full overflow-hidden bg-pink-50"
+                                                                        style={{ gridTemplateColumns: `repeat(${images.length || 1}, minmax(0, 1fr))` }}
                                                                     >
                                                                         {images.map((image, imageIndex) => (
                                                                             <img
@@ -414,7 +558,7 @@ const TestForm = () => {
                                                                         className="absolute right-3 top-3 z-10 size-6 bg-white shadow-sm"
                                                                         style={{ color: PINK, borderColor: checked ? PINK : "white" } as React.CSSProperties}
                                                                     />
-                                                                    <span className="px-4 py-4 leading-snug font-semibold" style={{ color: checked ? TEXT_DARK : TEXT_MID }}>
+                                                                    <span className="px-3 py-3 text-sm leading-snug font-semibold" style={{ color: checked ? TEXT_DARK : TEXT_MID }}>
                                                                         {opzione.label}
                                                                     </span>
                                                                 </label>
@@ -428,7 +572,7 @@ const TestForm = () => {
                                                             form.setValue(domandaId, v, { shouldValidate: true })
                                                             setFormMessage("")
                                                         }}
-                                                        className="grid grid-cols-1 sm:grid-cols-2 gap-3"
+                                                        className="grid grid-cols-1 sm:grid-cols-2 gap-2.5"
                                                     >
                                                         {domanda.opzioni.map((opzione, optionIndex) => {
                                                             const checked = form.watch(domandaId) === opzione.value
@@ -437,7 +581,7 @@ const TestForm = () => {
                                                                 <label
                                                                     key={opzione.id}
                                                                     htmlFor={opzione.id}
-                                                                    className="relative flex min-h-36 flex-col items-center justify-center gap-3 rounded-xl p-5 cursor-pointer text-center transition-all duration-150 hover:-translate-y-0.5 hover:shadow-md"
+                                                                    className="relative flex min-h-28 flex-col items-center justify-center gap-2 rounded-xl p-3.5 cursor-pointer text-center transition-all duration-150 hover:-translate-y-0.5 hover:shadow-md"
                                                                     style={{
                                                                         border: `1.5px solid ${checked ? PINK : PINK_MID}`,
                                                                         background: checked ? "#fff8fb" : "white",
@@ -450,10 +594,10 @@ const TestForm = () => {
                                                                         className="absolute right-3 top-3 size-4"
                                                                         style={{ color: PINK, borderColor: checked ? PINK : PINK_MID } as React.CSSProperties}
                                                                     />
-                                                                    <span className="flex size-12 items-center justify-center rounded-full" style={{ background: PINK_LIGHT, color: TEXT_SOFT }}>
-                                                                        <Icon size={22} strokeWidth={1.9} />
+                                                                    <span className="flex size-10 items-center justify-center rounded-full" style={{ background: PINK_LIGHT, color: TEXT_SOFT }}>
+                                                                        <Icon size={19} strokeWidth={1.9} />
                                                                     </span>
-                                                                    <span className="max-w-112 text-sm sm:text-base leading-snug font-semibold" style={{ color: checked ? TEXT_DARK : TEXT_MID }}>
+                                                                    <span className="max-w-112 text-sm leading-snug font-semibold" style={{ color: checked ? TEXT_DARK : TEXT_MID }}>
                                                                         {opzione.label}
                                                                     </span>
                                                                 </label>
@@ -470,10 +614,10 @@ const TestForm = () => {
                                             </>
                                         )}
 
-                                        {isLeadStep && !isConfirmingLead && (
+                                        {isLeadStep && (
                                             <div className="flex flex-col gap-4">
                                                 <div className="space-y-3 text-start">
-                                                    <h1 className="text-4xl lg:text-5xl font-semibold" style={{ color: TEXT_DARK }}>
+                                                    <h1 className="text-3xl lg:text-4xl font-semibold" style={{ color: TEXT_DARK }}>
                                                         🩷 La tua routine è pronta
                                                     </h1>
                                                     <p style={{ color: TEXT_MID }}>
@@ -564,47 +708,6 @@ const TestForm = () => {
                                             </div>
                                         )}
 
-                                        {isConfirmingLead && (
-                                            <div className="flex flex-col gap-5 text-start">
-                                                <div className="space-y-3">
-                                                    <div className="w-11 h-11 rounded-full flex items-center justify-center" style={{ background: PINK_LIGHT, color: PINK }}>
-                                                        <Check size={22} />
-                                                    </div>
-                                                    <h1 className="text-3xl lg:text-4xl font-semibold" style={{ color: TEXT_DARK }}>
-                                                        Confermi i tuoi dati?
-                                                    </h1>
-                                                    <p className="leading-relaxed" style={{ color: TEXT_MID }}>
-                                                        Useremo questi dati per inviarti la routine personalizzata e i consigli richiesti.
-                                                    </p>
-                                                </div>
-
-                                                <div className="grid grid-cols-1 gap-3">
-                                                    <div className="rounded-2xl p-4" style={{ border: `1.5px solid ${PINK_MID}`, background: PINK_LIGHT }}>
-                                                        <p className="text-sm font-semibold uppercase" style={{ color: TEXT_SOFT }}>
-                                                            Nome
-                                                        </p>
-                                                        <p className="text-lg font-semibold break-words" style={{ color: TEXT_DARK }}>
-                                                            {form.watch("nome")}
-                                                        </p>
-                                                    </div>
-                                                    <div className="rounded-2xl p-4" style={{ border: `1.5px solid ${PINK_MID}`, background: PINK_LIGHT }}>
-                                                        <p className="text-sm font-semibold uppercase" style={{ color: TEXT_SOFT }}>
-                                                            Email
-                                                        </p>
-                                                        <p className="text-lg font-semibold break-words" style={{ color: TEXT_DARK }}>
-                                                            {form.watch("email")}
-                                                        </p>
-                                                    </div>
-                                                    <div className="flex items-center gap-2">
-                                                        <MailWarningIcon />
-                                                        <p>
-                                                            controlla che la tua e-mail sia corretta altrimenti non ti arriverà la routine
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        )}
-
                                         {formMessage && (
                                             <p className="rounded-xl px-4 py-3 text-start" style={{ color: PINK, background: PINK_LIGHT }}>
                                                 {formMessage}
@@ -615,7 +718,7 @@ const TestForm = () => {
                             </div>
 
                             {isSubmitting && (
-                                <div className="mx-6 mb-4 rounded-2xl p-5 text-center" style={{ background: PINK_LIGHT, border: `1px solid ${PINK_MID}` }}>
+                                <div className="relative z-10 mx-6 mb-4 rounded-2xl p-5 text-center" style={{ background: PINK_LIGHT, border: `1px solid ${PINK_MID}` }}>
                                     <div className="flex flex-col items-center gap-3">
                                         <div className="w-10 h-10 rounded-full border-[3px] border-t-transparent animate-spin"
                                             style={{ borderColor: `${PINK_MID} ${PINK_MID} ${PINK_MID} transparent` }} />
@@ -630,30 +733,20 @@ const TestForm = () => {
                             )}
 
                             {!isSubmitting && (
-                                <div className="px-6 pb-6 pt-2 flex flex-col gap-3">
+                                <div className="relative z-10 px-5 pb-5 pt-1.5 flex flex-col gap-2.5">
                                     <div className="flex justify-between gap-3">
                                         <button
                                             type="button"
-                                            onClick={isConfirmingLead ? editLeadData : prevQuestion}
-                                            disabled={isFirst && !isConfirmingLead}
+                                            onClick={prevQuestion}
+                                            disabled={isFirst}
                                             className="flex items-center gap-1.5 px-4 py-2 rounded-xl font-medium transition-all duration-150 disabled:opacity-30 cursor-pointer"
                                             style={{ border: `1.5px solid ${PINK_MID}`, color: TEXT_MID, background: "white" }}
                                         >
-                                            {isConfirmingLead ? <Pencil size={14} /> : <ArrowLeft size={14} />}
-                                            {isConfirmingLead ? "Modifica dati" : "Indietro"}
+                                            <ArrowLeft size={14} />
+                                            Indietro
                                         </button>
 
-                                        {isConfirmingLead ? (
-                                            <button
-                                                type="button"
-                                                onClick={submitConfirmed}
-                                                className="flex items-center gap-1.5 px-5 py-2 rounded-xl font-semibold transition-all duration-150 cursor-pointer"
-                                                style={{ background: PINK, color: "white" }}
-                                            >
-                                                <Check size={16} />
-                                                Confermo
-                                            </button>
-                                        ) : !isLast ? (
+                                        {!isLast ? (
                                             <button
                                                 type="button"
                                                 onClick={nextQuestion}
@@ -678,13 +771,15 @@ const TestForm = () => {
                         </div>
                     </form>
                 )}
-            </div>
+                </div>
             {reply.length > 0 && (
                 <Reply
                     nome={nomeRisultato}
                     prodotti={prodottiTrovati}
+                    coupon={coupon}
                 />
             )}
+            </div>
         </div>
     )
 }

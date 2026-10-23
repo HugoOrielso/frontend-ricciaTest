@@ -1,9 +1,15 @@
 export const prodottiDisponibili = [
   {
-    nome: "Kit Idratazione profonda",
-    descrizione: "Un kit dedicato all'idratazione profonda del capello. Indicato quando i ricci risultano secchi, spenti e poco flessibili. L'olio aiuta a ricostruire la barriera lipidica, mentre il trattamento idratante supporta la corretta idratazione della fibra.",
-    immagine: "https://laragazzariccia.com/cdn/shop/files/KitNutrire_1_1080x1080.png",
-    link: "https://laragazzariccia.com/products/kit-nutrimento-1",
+    nome: "Kit Recovery – Balsamo + Booster Lipidico",
+    descrizione: "Kit composto da Balsamo Riccia e Booster Lipidico perfetto per il trattamento super idratante che dona morbidezza, elasticità e definizione ai tuoi ricci, lasciandoli lucenti e sani.",
+    immagine: "/images/kit_recovery.png",
+    link: "https://laragazzariccia.com/products/kit-recovery-1",
+  },
+  {
+    nome: "Balsamo Riccia",
+    descrizione: "Balsamo nutriente e districante studiato per ammorbidire, districare e controllare il crespo senza appesantire, mantenendo il riccio morbido, elastico e facilmente gestibile.",
+    immagine: "/images/balsamo_1080x1080.webp",
+    link: "https://laragazzariccia.com/products/balsamo-riccia",
   },
   {
     nome: "Kit Ricci Perfetti",
@@ -12,16 +18,28 @@ export const prodottiDisponibili = [
     link: "https://laragazzariccia.com/products/shampoo-balsamo-ricci-perfetti",
   },
   {
-    nome: "Lavaggio invertito + scrub",
+    nome: "Kit Lavaggio base",
     descrizione: "Un kit lavaggio essenziale per iniziare a prenderti cura dei tuoi capelli. I ricci belli non iniziano dallo styling, iniziano dal lavaggio.",
     immagine: "https://laragazzariccia.com/cdn/shop/files/ChatGPTImage23apr2026_12_33_23_1080x1080.png",
     link: "https://laragazzariccia.com/products/kit-lavaggio-riccia-essential",
   },
   {
+    nome: "Kit Lavaggio Riccia",
+    descrizione: "Una routine completa con scrub, shampoo, balsamo e leave-in spray per detergere, districare e mantenere i ricci definiti e leggeri più a lungo.",
+    immagine: "/images/prodottiriccia_1080x1080.webp",
+    link: "https://laragazzariccia.com/products/kit-lavaggio-riccia",
+  },
+  {
     nome: "Kit Volume WOW",
     descrizione: "Kit composto da Leave-in Riccia e Gel lunga tenuta, ideale per dare il giusto volume ai tuoi ricci.",
-    immagine: "https://laragazzariccia.com/cdn/shop/files/Kit_volume_1_1080x1080.webp",
+    immagine: "https://laragazzariccia.com/cdn/shop/files/Kit_styling_la_ragazza_riccia_1080x1080.jpg?v=1785493264",
     link: "https://laragazzariccia.com/products/kit-volume",
+  },
+  {
+    nome: "Styling Gel",
+    descrizione: "Gel styling studiato per aiutare il riccio a mantenere forma, definizione ed elasticità più a lungo. Protegge la fibra da umidità, calore, sole e stress ambientali, contrastando crespo e perdita di tenuta.",
+    immagine: "https://laragazzariccia.com/cdn/shop/files/styling_gel_2_86b178a7-9886-40b9-9158-ea4097360b3c_1080x1080.webp?v=1757079106",
+    link: "https://laragazzariccia.com/products/stling-gel",
   },
   {
     nome: "Kit Riparazione",
